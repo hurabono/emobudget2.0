@@ -56,7 +56,6 @@ const renderTransactionItem = ({ item }: { item: Transaction }) => {
     <View style={styles.itemContainer}>
       <View style={styles.itemTextContainer}>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemCategory}>{displayCategory}</Text>
         <Text style={styles.itemDate}>{item.date}</Text>
       </View>
       <Text style={item.amount < 0 ? styles.itemAmountNegative : styles.itemAmountPositive}>
@@ -80,7 +79,7 @@ const renderTransactionItem = ({ item }: { item: Transaction }) => {
         <View style={styles.header}>
             <Text style={styles.headerTitle}>Transactions</Text>
         </View>
-        <SpendingAnalysis />
+        <SpendingAnalysis transactions={transactions}  />
         <FlatList
             data={transactions}
             keyExtractor={(item) => item.transaction_id || `${item.name}-${item.date}`}
