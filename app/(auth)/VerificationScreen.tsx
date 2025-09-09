@@ -1,4 +1,3 @@
-// app/(auth)/VerificationScreen.tsx
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Button, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
@@ -15,7 +14,10 @@ const VerificationScreen = () => {
         return;
     }
     try {
-      await apiClient.post(`/api/auth/verify-email?email=${email}&code=${code}`);
+      /* 09092025
+       * URL의 쿼리 파라미터 대신, 요청 본문(body)에 email과 code를 담아 보냅니다.
+       */
+      await apiClient.post('/api/auth/verify-email', { email, code });
       Alert.alert("Success", "Email verification successful. Please log in.", [
           { text: 'OK', onPress: () => router.replace('/LoginScreen') }
       ]);
@@ -39,7 +41,7 @@ const VerificationScreen = () => {
   );
 };
 
-// Add your original styles object here...
+
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#f5f5f5' },
   title: { fontSize: 28, fontWeight: 'bold', color: '#333', marginBottom: 40 },
