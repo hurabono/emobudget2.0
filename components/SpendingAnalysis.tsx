@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-// This interface must match the one in TransactionsScreen.tsx
+
+// TransactionsScreen.tsx와 동일한 인터페이스를 사용하도록 통일합니다.
+// transaction_id는 백엔드에서 제공하지 않으므로 제거합니다.
 interface Transaction {
-  transaction_id: string;
   name: string;
   date: string;
   amount: number;
@@ -21,7 +22,7 @@ const generateColor = (str: string) => {
   if (str.length === 0) return '#CCCCCC';
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    hash = hash & hash; // Ensure 32bit integer
+    hash = hash & hash; 
   }
   const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
   return '#' + '00000'.substring(0, 6 - c.length) + c;
@@ -41,6 +42,8 @@ const SpendingAnalysis = ({ transactions }: SpendingAnalysisProps) => {
   const spendingByCategory = transactions
     .filter(t => t.amount > 0 && t.category !== 'Uncategorized' && t.category !== 'Other')
     .reduce((acc, t) => {
+
+      // 이제 item.category가 정상적으로 들어오므로 이 로직이 올바르게 동작합니다.
       acc[t.category] = (acc[t.category] || 0) + t.amount;
       return acc;
     }, {} as Record<string, number>);

@@ -2,15 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import apiClient from '../../api';
 import SpendingAnalysis from '../../components/SpendingAnalysis';
+
+// 실제 백엔드 API(/api/transactions)가 반환하는 데이터 구조와 정확히 일치시킵니다.
+// personal_finance_category 객체 대신 category 문자열을 사용합니다.
 interface Transaction {
-  transaction_id: string;
   name: string;
-  date: string;
   amount: number;
-  personal_finance_category: {
-    primary: string;
-    detailed: string;
-  };
+  date: string;
+  category: string;
 }
 
 const TransactionsScreen = () => {
@@ -19,13 +18,17 @@ const TransactionsScreen = () => {
 
   // This useEffect has been made more robust
   useEffect(() => {
-    let isActive = true; // 1. Flag to track if the component is still mounted
+    let isActive = true; 
 
     const fetchTransactions = async () => {
       try {
         const response = await apiClient.get('/api/transactions');
-        // 2. Only update state if the component is still active
+        // Only update state if the component is still active
         if (isActive) {
+        
+          // 백엔드에서 transaction_id를 보내주지 않으므로, 이 부분은 클라이언트에서 고유 ID를 생성해 주거나
+          // API 응답에 id를 포함하도록 수정해야 합니다. 지금은 임시로 인덱스를 사용합니다.
+          // 또한, API 응답 데이터가 Transaction[] 타입과 일치하므로 바로 상태에 설정합니다.
           setTransactions(response.data);
         }
       } catch (error) {
@@ -39,18 +42,19 @@ const TransactionsScreen = () => {
 
     fetchTransactions();
 
-    // 3. This is the cleanup function
+    // This is the cleanup function
     return () => {
       isActive = false;
     };
-  }, []); // The empty array is correct, do not change it
+  }, []);
 
 
 
 
 const renderTransactionItem = ({ item }: { item: Transaction }) => {
-  // personal_finance_category가 없으면 "Uncategorized" 출력
-  const displayCategory = item.personal_finance_category?.primary || "Uncategorized";
+  // 09092025
+  // personal_finance_category가 아닌, API 응답에 포함된 category 필드를 직접 사용합니다.
+  const displayCategory = item.category || "Uncategorized";
 
   return (
     <View style={styles.itemContainer}>
@@ -59,7 +63,9 @@ const renderTransactionItem = ({ item }: { item: Transaction }) => {
         <Text style={styles.itemDate}>{item.date}</Text>
       </View>
       <Text style={item.amount < 0 ? styles.itemAmountNegative : styles.itemAmountPositive}>
-        {item.amount < 0 ? '' : '-'} {Math.abs(item.amount).toFixed(2)} CAD
+        {/*09092025  지출(양수) 금액 앞에 -를 붙여 일관성을 유지합니다. 백엔드에서 이미 양수로 처리되어 있습니다. */}
+        {item.amount > 0 ? '- ' : ''}
+        {Math.abs(item.amount).toFixed(2)} CAD
       </Text>
     </View>
   );
@@ -79,17 +85,21 @@ const renderTransactionItem = ({ item }: { item: Transaction }) => {
         <View style={styles.header}>
             <Text style={styles.headerTitle}>Transactions</Text>
         </View>
+        {/* 09092025 이제 transactions 데이터가 SpendingAnalysis가 기대하는 타입과 일치하여 오류가 없습니다. */}
         <SpendingAnalysis transactions={transactions}  />
         <FlatList
+            // 09092025
+            // transaction_id가 없으므로, 각 항목을 고유하게 식별할 수 있는 더 안정적인 키를 만듭니다.
+            // 여기서는 이름, 날짜, 금액, 인덱스를 조합하여 고유성을 보장합니다.
             data={transactions}
-            keyExtractor={(item) => item.transaction_id || `${item.name}-${item.date}`}
+            keyExtractor={(item, index) => `${item.name}-${item.date}-${item.amount}-${index}`}
             renderItem={renderTransactionItem}
         />
     </SafeAreaView>
   );
 };
 
-// Styles remain the same
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f0f4f8' },
   header: { backgroundColor: '#ffffff', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
