@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import apiClient from '../../api';
+import EmotionalSpendingAnalysis from '../../components/EmotionalSpendingAnalysis';
 import SpendingAnalysis from '../../components/SpendingAnalysis';
 
-// 실제 백엔드 API(/api/transactions)가 반환하는 데이터 구조와 정확히 일치시킵니다.
-// personal_finance_category 객체 대신 category 문자열을 사용합니다.
+// Transaction 데이터 타입을 정의합니다.
 interface Transaction {
   name: string;
   amount: number;
@@ -12,27 +12,50 @@ interface Transaction {
   category: string;
 }
 
+//이제 API는 분석 데이터와 거래내역을 함께 보내줍니다.
+interface ApiResponse {
+  topCategory: string;
+  spendingByCategory: Record<string, number>;
+  emotionalSpendingPattern: string;
+  transactions: Transaction[];
+}
+
 const TransactionsScreen = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  // 거래내역과 분석 데이터를 하나의 상태로 관리합니다.
+  const [data, setData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // This useEffect has been made more robust
   useEffect(() => {
-    let isActive = true; 
+    let isActive = true;
 
-    const fetchTransactions = async () => {
+    // const fetchData = async () => {
+    //   try {
+    //     //API 호출을 '/api/analysis/spending-pattern' 하나로 통합합니다.
+    //     const response = await apiClient.get<ApiResponse>('/api/analysis/spending-pattern');
+    //     if (isActive) {
+    //       setData(response.data);
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to fetch analysis data:', error);
+    //   } finally {
+    //     if (isActive) {
+    //       setIsLoading(false);
+    //     }
+    //   }
+    // };
+
+    const fetchData = async () => {
       try {
-        const response = await apiClient.get('/api/transactions');
-        // Only update state if the component is still active
-        if (isActive) {
+        // --- [테스트중!!!!] ---
+        // API 주소 끝에 '?test=true'를 추가하여 백엔드가 테스트 데이터를 보내도록 요청합니다.
+        const response = await apiClient.get<ApiResponse>('/api/analysis/spending-pattern?test=true');
+        // --- [임시 수정 완료] ---
         
-          // 백엔드에서 transaction_id를 보내주지 않으므로, 이 부분은 클라이언트에서 고유 ID를 생성해 주거나
-          // API 응답에 id를 포함하도록 수정해야 합니다. 지금은 임시로 인덱스를 사용합니다.
-          // 또한, API 응답 데이터가 Transaction[] 타입과 일치하므로 바로 상태에 설정합니다.
-          setTransactions(response.data);
+        if (isActive) {
+          setData(response.data);
         }
       } catch (error) {
-        console.error('Failed to fetch transactions:', error);
+        console.error('Failed to fetch analysis data:', error);
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -40,78 +63,94 @@ const TransactionsScreen = () => {
       }
     };
 
-    fetchTransactions();
+    fetchData();
 
-    // This is the cleanup function
     return () => {
       isActive = false;
     };
   }, []);
 
-
-
-
-const renderTransactionItem = ({ item }: { item: Transaction }) => {
-  // 09092025
-  // personal_finance_category가 아닌, API 응답에 포함된 category 필드를 직접 사용합니다.
-  const displayCategory = item.category || "Uncategorized";
-
-  return (
-    <View style={styles.itemContainer}>
-      <View style={styles.itemTextContainer}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemDate}>{item.date}</Text>
+  const renderTransactionItem = ({ item }: { item: Transaction }) => {
+    return (
+      <View style={styles.itemContainer}>
+        <View style={styles.itemTextContainer}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.itemDate}>{item.date}</Text>
+        </View>
+        <Text style={item.amount > 0 ? styles.itemAmountNegative : styles.itemAmountPositive}>
+          {item.amount > 0 ? '- ' : '+ '}$
+          {Math.abs(item.amount).toFixed(2)}
+        </Text>
       </View>
-      <Text style={item.amount < 0 ? styles.itemAmountNegative : styles.itemAmountPositive}>
-        {/*09092025  지출(양수) 금액 앞에 -를 붙여 일관성을 유지합니다. 백엔드에서 이미 양수로 처리되어 있습니다. */}
-        {item.amount > 0 ? '- ' : ''}
-        {Math.abs(item.amount).toFixed(2)} CAD
-      </Text>
-    </View>
-  );
-};
-
+    );
+  };
 
   if (isLoading) {
     return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#007AFF" /></View>;
   }
 
-  if (transactions.length === 0) {
-    return <View style={styles.loadingContainer}><Text>No transactions found.</Text></View>;
+  //  data 객체 또는 data.transactions가 비어있는 경우를 확인합니다.
+  if (!data || !data.transactions || data.transactions.length === 0) {
+    return <View style={styles.loadingContainer}><Text>거래 내역이 없습니다.</Text></View>;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-            <Text style={styles.headerTitle}>Transactions</Text>
-        </View>
-        {/* 09092025 이제 transactions 데이터가 SpendingAnalysis가 기대하는 타입과 일치하여 오류가 없습니다. */}
-        <SpendingAnalysis transactions={transactions}  />
-        <FlatList
-            // 09092025
-            // transaction_id가 없으므로, 각 항목을 고유하게 식별할 수 있는 더 안정적인 키를 만듭니다.
-            // 여기서는 이름, 날짜, 금액, 인덱스를 조합하여 고유성을 보장합니다.
-            data={transactions}
-            keyExtractor={(item, index) => `${item.name}-${item.date}-${item.amount}-${index}`}
-            renderItem={renderTransactionItem}
-        />
+      <FlatList
+        //  API 응답에 포함된 transactions 배열을 사용합니다.
+        data={data.transactions}
+        keyExtractor={(item, index) => `${item.name}-${item.date}-${item.amount}-${index}`}
+        renderItem={renderTransactionItem}
+        ListHeaderComponent={() => (
+          <>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>소비 내역 및 분석</Text>
+            </View>
+            <EmotionalSpendingAnalysis analysisText={data.emotionalSpendingPattern} />
+            {/* 이제 SpendingAnalysis 컴포넌트에 원본 거래 내역을 직접 전달합니다. */}
+            <SpendingAnalysis transactions={data.transactions} />
+            <Text style={styles.listTitle}>최근 거래 내역</Text>
+          </>
+        )}
+      />
     </SafeAreaView>
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f8' },
-  header: { backgroundColor: '#ffffff', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
-  headerTitle: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#111' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  itemContainer: { backgroundColor: '#fff', padding: 20, marginVertical: 8, marginHorizontal: 16, borderRadius: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', ...Platform.select({ ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, }, android: { elevation: 3, }, web: { borderWidth: 1, borderColor: '#e0e0e0', }, }), },
-  itemTextContainer: { flex: 1, marginRight: 10 },
-  itemName: { fontSize: 16, fontWeight: '600', color: '#333' },
-  itemCategory: { fontSize: 12, fontWeight: '600', color: '#ccc' },
-  itemDate: { fontSize: 14, color: '#666', marginTop: 4 },
-  itemAmountNegative: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  itemAmountPositive: { fontSize: 16, fontWeight: 'bold', color: '#2e7d32' },
-});
+    container: { flex: 1, backgroundColor: '#f0f4f8' },
+    header: { backgroundColor: '#ffffff', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
+    headerTitle: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#111' },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    listTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: '#333',
+      paddingHorizontal: 20,
+      paddingTop: 20,
+      paddingBottom: 10,
+      backgroundColor: '#f0f4f8',
+    },
+    itemContainer: {
+      backgroundColor: '#fff',
+      padding: 20,
+      marginVertical: 8,
+      marginHorizontal: 16,
+      borderRadius: 8,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      ...Platform.select({
+        ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
+        android: { elevation: 3 },
+        web: { borderWidth: 1, borderColor: '#e0e0e0' },
+      }),
+    },
+    itemTextContainer: { flex: 1, marginRight: 10 },
+    itemName: { fontSize: 16, fontWeight: '600', color: '#333' },
+    itemDate: { fontSize: 14, color: '#666', marginTop: 4 },
+    itemAmountNegative: { fontSize: 16, fontWeight: 'bold', color: '#e74c3c' },
+    itemAmountPositive: { fontSize: 16, fontWeight: 'bold', color: '#2ecc71' },
+  });
 
 export default TransactionsScreen;
