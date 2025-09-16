@@ -3,12 +3,12 @@ import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
-import ImportantExpenseSection from "../../components/ImportantExpenseSection";
+
 
 interface Transaction {
   name: string;
   amount: number;
-  date: string; // ISO
+  date: string; 
   category: string;
 }
 
@@ -23,21 +23,44 @@ const HomeScreen = () => {
   const authContext = useContext(AuthContext);
   const router = useRouter();
   const [data, setData] = useState<{ transactions: Transaction[] } | null>(null);
+  
   const [expenses, setExpenses] = useState<ImportantExpense[]>([]);
+  
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/api/transactions");
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const fetchNextExpense = async () => {
+    try {
+      const res = await fetch("https://emobudget-server.onrender.com/api/expenses/me/next", {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${authContext?.userToken}`,
+        },
+      });
 
-    fetchTransactions();
-  }, []);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("서버 에러:", res.status, text);
+        return;
+      }
+
+    
+      const text = await res.text();
+      if (!text) {
+        setExpenses([]);
+        return;
+      }
+      const json = JSON.parse(text);
+      setExpenses(json ? [json] : []);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchNextExpense();
+}, [authContext?.userToken]);
+
+
 
   // generateAdvice 함수 (ImportantExpenseSection과 동일)
   function generateAdvice(expense: ImportantExpense, transactions: Transaction[]): string {
