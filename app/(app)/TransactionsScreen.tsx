@@ -25,32 +25,21 @@ const TransactionsScreen = () => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    let isActive = true;
 
-    // const fetchData = async () => {
-    //   try {
-    //     //API 호출을 '/api/analysis/spending-pattern' 하나로 통합합니다.
-    //     const response = await apiClient.get<ApiResponse>('/api/analysis/spending-pattern');
-    //     if (isActive) {
-    //       setData(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to fetch analysis data:', error);
-    //   } finally {
-    //     if (isActive) {
-    //       setIsLoading(false);
-    //     }
-    //   }
-    // };
+  // test toggle
+  const IS_TEST_MODE = true; 
+
+
+useEffect(() => {
+    let isActive = true;
 
     const fetchData = async () => {
       try {
-        // --- [테스트중!!!!] ---
-        // API 주소 끝에 '?test=true'를 추가하여 백엔드가 테스트 데이터를 보내도록 요청합니다.
-        const response = await apiClient.get<ApiResponse>('/api/analysis/spending-pattern?test=true');
-        // --- [임시 수정 완료] ---
-        
+        const endpoint = IS_TEST_MODE
+          ? '/api/analysis/spending-pattern?test=true'
+          : '/api/analysis/spending-pattern';
+
+        const response = await apiClient.get<ApiResponse>(endpoint);
         if (isActive) {
           setData(response.data);
         }
@@ -68,7 +57,9 @@ const TransactionsScreen = () => {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [IS_TEST_MODE]);
+
+
 
   const renderTransactionItem = ({ item }: { item: Transaction }) => {
     return (
