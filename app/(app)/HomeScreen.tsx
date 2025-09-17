@@ -1,9 +1,9 @@
 // app/(app)/HomeScreen.tsx
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
-
+import apiClient from '../../api';
 
 interface Transaction {
   name: string;
@@ -105,6 +105,27 @@ const HomeScreen = () => {
         (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
       )[0]
     : null;
+  
+  const handleDelete = async () => {
+    Alert.alert('Delete Account', 'This action is irreversible. Continue?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          try {
+            await apiClient.delete('/api/auth/delete-account', {
+              headers: { Authorization: `Bearer ${authContext?.userToken}` }
+            });
+            Alert.alert('Done', 'Your account has been deleted.');
+            await authContext?.logout();
+          } catch (e: any) {
+            const msg = e.response?.data || e.message || 'Failed to delete account.';
+            Alert.alert('Error', msg);
+          }
+        }
+      }
+    ]);
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -146,6 +167,7 @@ const HomeScreen = () => {
       <View style={styles.buttonContainer}>
         <Button title="Logout" onPress={() => authContext?.logout()} color="#888" />
       </View>
+      <Button title="Delete Account" onPress={handleDelete} />
     </SafeAreaView>
   );
 };
