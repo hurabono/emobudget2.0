@@ -14,6 +14,8 @@ apiClient.interceptors.request.use(async (config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log("📌 최종 요청:", config.method?.toUpperCase(), config.url);
+  console.log("📌 헤더:", config.headers);
   return config;
 });
 

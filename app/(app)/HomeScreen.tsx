@@ -4,6 +4,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
 import apiClient from '../../api';
+import AccountSection from '../../components/AccountSection';
+
 
 interface Transaction {
   name: string;
@@ -130,6 +132,7 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.text}>Login Successful!</Text>
+      
 
       {/* 상단: 가장 가까운 지출 1개만 표시 */}
       {nextExpense && (
@@ -157,13 +160,21 @@ const HomeScreen = () => {
           onPress={() => router.push('/AddImportantExpenseScreen')}
         />
       </View>
-
+      <AccountSection />
       <View style={styles.buttonContainer}>
         <Button title="Link Bank Account" onPress={() => router.push('/PlaidLinkScreen')} />
       </View>
       <View style={styles.buttonContainer}>
+      
+      <Button
+        title="Select Accounts"
+        onPress={() => router.push('/AccountSelectionScreen')}
+      />
+    </View>
+      <View style={styles.buttonContainer}>
         <Button title="View Transactions" onPress={() => router.push('/TransactionsScreen')} />
       </View>
+
       <View style={styles.buttonContainer}>
         <Button title="Logout" onPress={() => authContext?.logout()} color="#888" />
       </View>
