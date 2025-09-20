@@ -32,7 +32,7 @@ const HomeScreen = () => {
   useEffect(() => {
   const fetchNextExpense = async () => {
     try {
-      const res = await fetch("https://emobudget-server.onrender.com/api/expenses/me/next", {
+      const res = await fetch("https://emobudgetserver.onrender.com/api/expenses/me/next", {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${authContext?.userToken}`,

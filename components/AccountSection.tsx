@@ -18,6 +18,8 @@ const AccountSection = () => {
     const fetchAccounts = async () => {
       try {
         const response = await apiClient.get<Account[]>('/accounts/selected');
+         console.log("📌 /accounts/selected 응답:", JSON.stringify(response.data, null, 2)); 
+         
         setAccounts(response.data);
       } catch (err) {
         console.error('계좌 불러오기 실패:', err);

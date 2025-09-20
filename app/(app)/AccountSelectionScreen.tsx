@@ -3,11 +3,15 @@ import apiClient from "../../api"; // 기존 axios client
 import { useRouter } from "expo-router";
 
 interface Account {
-  accountId: string;  // ✅ 서버 응답과 맞춤 (원래 id → accountId)
+  accountId: string;
   name: string;
+  mask?: string;
   subtype?: string;
+  currentBalance?: number;
+  availableBalance?: number;
   nickname?: string;
 }
+
 
 const AccountSelectionScreen = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -18,6 +22,7 @@ const AccountSelectionScreen = () => {
   const fetchAccounts = async () => {
     try {
       const res = await apiClient.get("/accounts/all");
+      console.log("👉 /accounts/all 응답:", res.data);
       setAccounts(res.data);
     } catch (err) {
       console.error("계좌 불러오기 실패", err);
