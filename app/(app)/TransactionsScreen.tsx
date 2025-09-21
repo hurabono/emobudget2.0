@@ -124,13 +124,9 @@ const TransactionsScreen = () => {
   }, [accounts]);
 
   const renderTransactionItem = ({ item }: { item: Transaction }) => {
-    const nickname =
-      (item.accountId && accountMap[item.accountId]) || '계좌 정보 없음';
-
-    // 🔎 거래별 매칭 로그 (필요하면 주석 해제)
-    // console.log(
-    //   `🔗 match -> tx.accountId=${item.accountId} / nickname=${nickname}`
-    // );
+  const nickname =
+    (item.accountId && item.accountId !== 'NO_ACCOUNT' && accountMap[item.accountId]) 
+    || '계좌 정보 없음';
 
     const amountIsExpense = item.amount > 0;
 
@@ -139,16 +135,23 @@ const TransactionsScreen = () => {
         <View style={styles.itemTextContainer}>
           <Text style={styles.itemName}>{item.name}</Text>
           <Text style={styles.itemDate}>{item.date}</Text>
-          {/* ✅ 무조건 렌더링해서 fallback이 보이도록 함 */}
+          {/* ✅ "NO_ACCOUNT" 도 안전하게 처리 */}
           <Text style={styles.itemAccount}>계좌: {nickname}</Text>
         </View>
 
-        <Text style={amountIsExpense ? styles.itemAmountNegative : styles.itemAmountPositive}>
+        <Text
+          style={
+            amountIsExpense
+              ? styles.itemAmountNegative
+              : styles.itemAmountPositive
+          }
+        >
           {amountIsExpense ? '- ' : '+ '}${Math.abs(item.amount).toFixed(2)}
         </Text>
       </View>
     );
   };
+
 
   if (isLoading) {
     return (
