@@ -1,11 +1,12 @@
 // app/(app)/HomeScreen.tsx
+import Screen from '@/components/Screen';
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { AuthContext } from '../../context/AuthContext';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import apiClient from '../../api';
 import AccountSection from '../../components/AccountSection';
-
+import GradientBackground from '../../components/GradientBackground';
+import { AuthContext } from '../../context/AuthContext';
 
 interface Transaction {
   name: string;
@@ -130,7 +131,8 @@ const HomeScreen = () => {
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <GradientBackground>
+    <Screen >
       <Text style={styles.text}>Login Successful!</Text>
       
 
@@ -174,17 +176,19 @@ const HomeScreen = () => {
       <View style={styles.buttonContainer}>
         <Button title="View Transactions" onPress={() => router.push('/TransactionsScreen')} />
       </View>
+      <Text className="text-red-500 bg-black">tailwind ok?</Text>
 
       <View style={styles.buttonContainer}>
         <Button title="Logout" onPress={() => authContext?.logout()} color="#888" />
       </View>
       <Button title="Delete Account" onPress={handleDelete} />
-    </SafeAreaView>
+    </Screen>
+    </GradientBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20 },
   text: { fontSize: 20, color: '#333', marginBottom: 20 },
   buttonContainer: { width: '100%', marginTop: 10 },
   highlightBox: { padding: 16, backgroundColor: '#fff3cd', borderRadius: 8, marginBottom: 20 },

@@ -37,18 +37,31 @@ const PlaidLinkScreen = () => {
   }, [createLinkToken]);
 
   const onLinkSuccess = useCallback(async (public_token: string) => {
-    try {
-      await apiClient.post('/api/plaid/get_access_token', {
-        public_token: public_token,
-      }, {
+  try {
+    await apiClient.post('/api/plaid/get_access_token', { public_token }, {
+      headers: { 'Authorization': `Bearer ${authContext?.userToken}` }
+    });
+
+    // ✅ 짧은 폴링(웹훅 없이도 준비 끝날 때까지 2~5번만 확인)
+    const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+    let ok = false;
+    for (let i = 0; i < 5; i++) {         // 최대 5회 시도
+      const r = await apiClient.get('/api/transactions', {
         headers: { 'Authorization': `Bearer ${authContext?.userToken}` }
       });
-      webAlert("Success!", "Your account has been successfully linked.");
-      router.back();
-    } catch (error) {
-      webAlert("Error", "Failed to exchange Access Token.");
+      if (Array.isArray(r.data) && r.data.length > 0) { ok = true; break; }
+      await sleep(2500); // 2.5초 간격
     }
-  }, [router, authContext?.userToken]);
+
+    webAlert("Success!", ok
+      ? "계좌 연결 및 거래 동기화 완료!"
+      : "계좌 연결 완료. 거래 준비 중이라 잠시 후 새로고침 해주세요.");
+
+    router.back();
+  } catch (error) {
+    webAlert("Error", "Failed to exchange Access Token.");
+  }
+}, [router, authContext?.userToken]);
 
   const { open, ready } = usePlaidLink({
     token: linkToken,

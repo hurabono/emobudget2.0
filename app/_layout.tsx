@@ -2,7 +2,9 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { useContext, useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import GradientBackground from '../components/GradientBackground';
 import { AuthContext, AuthProvider } from '../context/AuthContext';
+import './global.css';
 
 const InitialLayout = () => {
   const authContext = useContext(AuthContext);
@@ -44,7 +46,13 @@ const InitialLayout = () => {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <InitialLayout />
+      {/* ★ 전역 그라디언트: 어떤 화면이든 항상 보이게 */}
+      <GradientBackground>
+        {/* Slot이 높이를 가지도록 flex:1 래핑 */}
+        <View style={{ flex: 1 }}>
+          <InitialLayout />
+        </View>
+      </GradientBackground>
     </AuthProvider>
   );
 }

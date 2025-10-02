@@ -12,14 +12,21 @@ import apiClient from '../../api';
 import EmotionalSpendingAnalysis from '../../components/EmotionalSpendingAnalysis';
 import SpendingAnalysis from '../../components/SpendingAnalysis';
 
+import GradientBackground from '../../components/GradientBackground';
+
 // 거래 데이터 타입
 interface Transaction {
   name: string;
   amount: number;
   date: string;
   category: string;
-  accountId: string | null; // 서버에서 null일 수도 있으니 null 허용
+  accountId: string | null; 
   transactionTime?: string | null;
+
+  accountName?: string;
+  accountMask?: string;
+  accountNickname?: string;
+
 }
 
 // API 응답 타입
@@ -125,8 +132,11 @@ const TransactionsScreen = () => {
 
   const renderTransactionItem = ({ item }: { item: Transaction }) => {
   const nickname =
-    (item.accountId && item.accountId !== 'NO_ACCOUNT' && accountMap[item.accountId]) 
-    || '계좌 정보 없음';
+    item.accountNickname
+    || item.accountName
+    || ((item.accountId && item.accountId !== 'NO_ACCOUNT' && accountMap[item.accountId])
+        ? accountMap[item.accountId]
+        : '계좌 정보 없음');
 
     const amountIsExpense = item.amount > 0;
 
@@ -170,7 +180,8 @@ const TransactionsScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <GradientBackground>
+       <SafeAreaView style={styles.container}>
       <FlatList
         data={data.transactions}
         keyExtractor={(item, index) =>
@@ -189,16 +200,15 @@ const TransactionsScreen = () => {
         )}
       />
     </SafeAreaView>
+    </GradientBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f8' },
+  container: { flex: 1, backgroundColor: 'transparent', position: 'relative', zIndex: 100, ...Platform.select({ android: { elevation: 1 } }) },
   header: {
-    backgroundColor: '#ffffff',
     padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+  
   },
   headerTitle: {
     fontSize: 28,
@@ -214,7 +224,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: 'transparent',
   },
   itemContainer: {
     backgroundColor: '#fff',

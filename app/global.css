@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* === 웹 루트 배경을 "항상 투명"으로 강제 === */
+html, body, #root, [data-expo-root] {
+  height: 100%;
+  background: transparent !important;
+}
