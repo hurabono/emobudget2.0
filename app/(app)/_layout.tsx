@@ -12,6 +12,7 @@ export default function AppTabsLayout() {
           borderTopWidth: 0,
           height: 65,
           paddingBottom: 8,
+          paddingTop:8
         },
         tabBarActiveTintColor: "#040305",
         tabBarInactiveTintColor: "#8F8AA6",

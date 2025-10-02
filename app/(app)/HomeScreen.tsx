@@ -1,5 +1,6 @@
 // app/(app)/HomeScreen.tsx
 import Screen from '@/components/Screen';
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
@@ -132,76 +133,90 @@ const HomeScreen = () => {
 
   return (
     <GradientBackground>
-    <Screen>
-      <Text style={styles.text}>Login Successful!</Text>
-      <Text style={styles.email}>
-          {authContext?.userEmail ?? "Unknown user"}
-        </Text>
-
-      {/* 상단: 가장 가까운 지출 1개만 표시 */}
-      {nextExpense && (
-        <View style={styles.highlightBox}>
-          <Text>
-            {nextExpense.name} - ${nextExpense.amount} (📅 {nextExpense.dueDate})
+      <Screen>
+        <View className='flex flex-row mb-5'>
+          <Ionicons name="cloud-outline" size={35} color="white" />
+          <Text className='font-lg font-flex tracking-wider' style={styles.email}>
+            Hi {authContext?.userEmail ?? "Unknown user"}
           </Text>
-          <Text>
-            {generateAdvice(nextExpense, data?.transactions || [])}
-          </Text>
-
-          {/* 💡 1000달러 이상이면 추가 경고 */}
-          {nextExpense.amount >= 1000 && (
-            <Text style={styles.bigExpenseWarning}>
-              ⚠️ 곧 큰 금액(${nextExpense.amount})이 빠져나갈 예정입니다.
-            </Text>
-          )}
         </View>
-      )}
 
-      {/* 지출 추가 버튼 → 별도 페이지로 이동 */}
-      <View style={styles.buttonContainer}>
+        {/* 상단: 가장 가까운 지출 1개만 표시 */}
+        {nextExpense && (
+          <View style={styles.highlightBox}>
+            <Text>
+              {nextExpense.name} - ${nextExpense.amount} (📅 {nextExpense.dueDate})
+            </Text>
+            <Text>
+              {generateAdvice(nextExpense, data?.transactions || [])}
+            </Text>
+
+            {/* 💡 1000달러 이상이면 추가 경고 */}
+            {nextExpense.amount >= 1000 && (
+              <Text style={styles.bigExpenseWarning}>
+                ⚠️ 곧 큰 금액(${nextExpense.amount})이 빠져나갈 예정입니다.
+              </Text>
+            )}
+          </View>
+        )}
+
+
+        <AccountSection />
+        <View style={styles.buttonContainer}>
+          <Button title="Link Bank Account" onPress={() => router.push('/PlaidLinkScreen')} />
+        </View>
+        <View style={styles.buttonContainer}>
+        
         <Button
-          title="중요한 지출 추가"
-          onPress={() => router.push('/AddImportantExpenseScreen')}
+          title="Select Accounts"
+          onPress={() => router.push('/AccountSelectionScreen')}
         />
       </View>
-      <AccountSection />
-      <View style={styles.buttonContainer}>
-        <Button title="Link Bank Account" onPress={() => router.push('/PlaidLinkScreen')} />
-      </View>
-      <View style={styles.buttonContainer}>
-      
-      <Button
-        title="Select Accounts"
-        onPress={() => router.push('/AccountSelectionScreen')}
-      />
-    </View>
-      <View style={styles.buttonContainer}>
-        <Button title="View Transactions" onPress={() => router.push('/TransactionsScreen')} />
-      </View>
-      <Text className="text-red-500 bg-black">tailwind ok?</Text>
 
-      <View style={styles.buttonContainer}>
-        <Button title="Logout" onPress={() => authContext?.logout()} color="#888" />
-      </View>
-      <Button title="Delete Account" onPress={handleDelete} />
-    </Screen>
+        <View style={styles.buttonContainer}>
+          <Button title="Logout" onPress={() => authContext?.logout()} color="#888" />
+        </View>
+        <Button title="Delete Account" onPress={handleDelete} />
+      </Screen>
     </GradientBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20 },
-  text: { fontSize: 20, color: '#333', marginBottom: 20 },
-  buttonContainer: { width: '100%', marginTop: 10 },
-  highlightBox: { padding: 16, backgroundColor: '#fff3cd', borderRadius: 8, marginBottom: 20 },
-  bigExpenseWarning: { marginTop: 8, color: 'red', fontWeight: 'bold' },
+  container: { 
+    flex: 1, 
+    justifyContent: 'flex-start', 
+    alignItems: 'center', 
+    padding: 20 
+  },
+  text: { 
+    fontSize: 20, 
+    color: '#333', 
+    marginBottom: 20 
+  },
+  buttonContainer: { 
+    width: '100%', 
+    marginTop: 10 
+  },
+  highlightBox: { 
+    padding: 16, 
+    backgroundColor: '#fff3cd', 
+    borderRadius: 8, 
+    marginBottom: 20 
+  },
+  bigExpenseWarning: { 
+    marginTop: 8, 
+    color: 'red', 
+    fontWeight: 'bold' 
+  },
   email: {
-    marginTop: 12,
-    marginBottom: 8,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 18,
     color: '#fff',      // 배경 위에서 보이게 흰색
-    fontWeight: '600',
+    marginLeft:18,
+    display: 'flex',
+    justifyContent:'center',
+    alignItems:'center'
   },
 });
 
