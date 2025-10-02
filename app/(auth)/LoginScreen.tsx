@@ -29,12 +29,12 @@ const LoginScreen = () => {
     <GradientBackground>
      <Screen>
        <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}>
         <SafeAreaView>
             <TouchableWithoutFeedback >
               <View style={styles.inner}>
-                <View style={[styles.formWrapper, isDesktop && styles.formWrapperDesktop]}>
+                <View>
                   <View className="flex-1 justify-center items-center">
                     <Image
                       source={require("../../assets/images/sun_from_space.png")}
@@ -42,7 +42,7 @@ const LoginScreen = () => {
                     />
                   </View>
                   <Text style={styles.title}>EmoBudget</Text>
-                  <Text className='text-base text-white text-center my-10 tracking-widest'> My smart budget tracker </Text>
+                  <Text className='font-flex text-base text-white text-center my-10 tracking-widest'> My smart budget tracker </Text>
                   <View className='w-[50%] h-20 border-r border-r-white mb-10'></View>
                   
                   {/* resetSuccess가 있으면 안내 문구 표시 */}
@@ -57,8 +57,8 @@ const LoginScreen = () => {
                   <TextInput className='focus:outline-none' style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry/>
                   
                     <Link className='text-center' href="/SignUpScreen" >
-                     <Text className="text-brand-dim font-bold font-serif pr-2"> We are meeting up first time? </Text>
-                     <Text className="text-brand-dim font-bold font-serif underline">Sign Up</Text>
+                     <Text className="text-brand-dim font-bold font-flex pr-2"> We are meeting up first time? </Text>
+                     <Text className="text-brand-dim font-bold font-flex underline">Sign Up</Text>
                     </Link>
 
                   <View style={styles.buttonContainer}>
@@ -67,8 +67,8 @@ const LoginScreen = () => {
                   
 
                   <Link className='text-center pt-2 mt-10' href="/ForgotPasswordScreen" >
-                     <Text className="text-brand-dim font-bold font-serif pr-2"> Opps, forget password? </Text>
-                     <Text className="text-brand-dim font-bold font-serif underline">Reset password</Text>
+                     <Text className="text-brand-dim font-bold font-flex pr-2"> Opps, forget password? </Text>
+                     <Text className="text-brand-dim font-bold font-flex underline">Reset password</Text>
                   </Link>
 
                 </View>
@@ -89,20 +89,20 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     padding: 20 
   },
-  formWrapper: { 
-    width: '100%', 
-    maxWidth: 400 
-  },
-  formWrapperDesktop: { 
-    marginTop:25,
-    padding: 30, 
-    borderRadius: 12, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.1, 
-    shadowRadius: 8, 
-    elevation: 3 
-  },
+  // formWrapper: { 
+  //   width: '100%', 
+  //   maxWidth: 400 
+  // },
+  // formWrapperDesktop: { 
+  //   marginTop:25,
+  //   padding: 30, 
+  //   borderRadius: 12, 
+  //   shadowColor: '#000', 
+  //   shadowOffset: { width: 0, height: 2 }, 
+  //   shadowOpacity: 0.1, 
+  //   shadowRadius: 8, 
+  //   elevation: 3 
+  // },
   title: { 
     fontSize: 40,          
     fontWeight: "bold",
@@ -121,11 +121,11 @@ const styles = StyleSheet.create({
     color: "#fff",              
     paddingVertical: 8,
     marginBottom: 20,
-    
+    fontSize:20,
   },
   buttonContainer: { 
     width: '100%', 
-    marginTop: 10,
+    marginTop: 50,
     letterSpacing: 2,
     fontWeight: "900",
   },

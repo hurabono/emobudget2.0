@@ -32,6 +32,10 @@ module.exports = {
         heading: ["InriaSerif_700Bold", "InriaSerif_600SemiBold", "serif"],
         serif:   ["InriaSerif_400Regular", "serif"],
         sans:    ["System"],
+        flex: ["RobotoFlex_400Regular", "System"],
+        flexmedium:  ["RobotoFlex_500Medium", "System"],
+        flexsemibold:["RobotoFlex_600SemiBold", "System"],
+        flexbold:["RobotoFlex_700Bold", "System"],
       },
       borderRadius: {
         xl: "16px",
@@ -45,5 +49,5 @@ module.exports = {
     },
   },
   plugins: [],
-  presets: [require("nativewind/preset")], // 그대로 유지
+  presets: [require("nativewind/preset")],
 };
