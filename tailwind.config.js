@@ -20,7 +20,7 @@ module.exports = {
           DEFAULT: "#F7DFE0",
           soft:    "#FFF7F6",
           card:    "#FFFFFF",
-          tint:    "#E4E1EC", // 구분선/테두리
+          tint:    "#E4E1EC",
         },
         txt: {
           DEFAULT: "#040305",

@@ -1,18 +1,25 @@
 // components/GradientBackground.tsx
 import { LinearGradient } from "expo-linear-gradient";
 import React, { ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 export default function GradientBackground({ children }: { children: ReactNode }) {
   return (
     <View style={styles.root}>
+      {/* 그라데이션 배경 */}
       <LinearGradient
-        colors={["#FBCBC9", "#F7DFE0", "#93A9D1"]}
-        start={{ x: 0, y: 0 }}
+        colors={["#93A9D1", "#FBCBC9", "#F7DFE0"]}
+        start={{ x: 1, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
-        pointerEvents="none"
       />
+
+      <Image
+        source={require("../assets/images/Group9.png")}
+        style={styles.topImage}
+        resizeMode="contain"
+      />
+
       <View style={styles.content}>
         {children}
       </View>
@@ -21,7 +28,22 @@ export default function GradientBackground({ children }: { children: ReactNode }
 }
 
 const styles = StyleSheet.create({
-  // 웹에서도 높이가 100%가 되도록 보장 (루트 배경이 투명해졌을 때 특히 중요)
-  root: { flex: 1, position: "relative", minHeight: "100%" as any },
-  content: { flex: 1, position: "relative", zIndex: 1 },
+  root: {
+    flex: 1,
+    position: "relative",
+    minHeight: "100%" as any,
+  },
+  content: {
+    flex: 1,
+    position: "relative",
+    zIndex: 1,
+  },
+  topImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    width:"100%",
+    zIndex: 0,
+  },
 });

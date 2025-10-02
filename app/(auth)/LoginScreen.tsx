@@ -1,9 +1,11 @@
 // app/(auth)/LoginScreen.tsx
-import { useRouter,useLocalSearchParams } from 'expo-router';
+import Screen from '@/components/Screen';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useContext, useState } from 'react';
-import { Alert, Button, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native';
+import GradientBackground from '../../components/GradientBackground';
+import Button from "../../components/ui/Button";
 import { AuthContext } from '../../context/AuthContext';
-
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -24,46 +26,110 @@ const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.inner}>
-            <View style={[styles.formWrapper, isDesktop && styles.formWrapperDesktop]}>
-              <Text style={styles.title}>Welcome Back!</Text>
-              {/* resetSuccess가 있으면 안내 문구 표시 */}
-                {resetSuccess === '1' && (
-                  <View style={styles.noticeBox}>
-                    <Text style={styles.noticeText}>
-                      비밀번호가 변경되었습니다. 다시 로그인 해주세요.
-                    </Text>
+    <GradientBackground>
+     <Screen>
+       <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}>
+        <SafeAreaView>
+            <TouchableWithoutFeedback >
+              <View style={styles.inner}>
+                <View style={[styles.formWrapper, isDesktop && styles.formWrapperDesktop]}>
+                  <View className="flex-1 justify-center items-center">
+                    <Image
+                      source={require("../../assets/images/sun_from_space.png")}
+                      className="w-24 h-24"
+                    />
                   </View>
-                )}
-              <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none"/>
-              <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry/>
-              <View style={styles.buttonContainer}>
-                <Button title="Login" onPress={handleLogin} />
+                  <Text style={styles.title}>EmoBudget</Text>
+                  <Text className='text-base text-white text-center my-10 tracking-widest'> My smart budget tracker </Text>
+                  <View className='w-[50%] h-20 border-r border-r-white mb-10'></View>
+                  
+                  {/* resetSuccess가 있으면 안내 문구 표시 */}
+                    {resetSuccess === '1' && (
+                      <View style={styles.noticeBox}>
+                        <Text style={styles.noticeText}>
+                          Your password has been changed. Please log in again.
+                        </Text>
+                      </View>
+                    )}
+                  <TextInput className='focus:outline-none' style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none"/>
+                  <TextInput className='focus:outline-none' style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry/>
+                  
+                    <Link className='text-center' href="/SignUpScreen" >
+                     <Text className="text-brand-dim font-bold font-serif pr-2"> We are meeting up first time? </Text>
+                     <Text className="text-brand-dim font-bold font-serif underline">Sign Up</Text>
+                    </Link>
+
+                  <View style={styles.buttonContainer}>
+                    <Button label="Start" onPress={handleLogin} />
+                  </View>
+                  
+
+                  <Link className='text-center pt-2 mt-10' href="/ForgotPasswordScreen" >
+                     <Text className="text-brand-dim font-bold font-serif pr-2"> Opps, forget password? </Text>
+                     <Text className="text-brand-dim font-bold font-serif underline">Reset password</Text>
+                  </Link>
+
+                </View>
               </View>
-              <View style={styles.buttonContainer}>
-                <Button title="Sign Up" onPress={() => router.push('/SignUpScreen')} color="#888" />
-              </View>
-              <View style={styles.buttonContainer}>
-              <Button title="Forgot Password?" onPress={() => router.push('/ForgotPasswordScreen')} color="#888" />
-              </View>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-    </SafeAreaView>
+            </TouchableWithoutFeedback>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+     </Screen>
+    </GradientBackground>
   );
 };
 
 // Add your original styles object here...
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f5f5f5' },
-  inner: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  formWrapper: { width: '100%', maxWidth: 400 },
-  formWrapperDesktop: { backgroundColor: '#fff', padding: 30, borderRadius: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#333', textAlign: 'center', marginBottom: 30 },
-  input: { width: '100%', height: 50, backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd', borderRadius: 8, paddingHorizontal: 15, marginBottom: 15, fontSize: 16 },
-  buttonContainer: { width: '100%', marginTop: 10 },noticeBox: {
+  inner: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: 20 
+  },
+  formWrapper: { 
+    width: '100%', 
+    maxWidth: 400 
+  },
+  formWrapperDesktop: { 
+    marginTop:25,
+    padding: 30, 
+    borderRadius: 12, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 8, 
+    elevation: 3 
+  },
+  title: { 
+    fontSize: 40,          
+    fontWeight: "bold",
+    color: "#fff", 
+    textAlign: "center",
+    marginBottom: 0,
+    textShadowColor: "rgba(255, 255, 255, 0.9)", 
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,     
+  },
+  input: { 
+    width: '100%', 
+    height: 50, 
+    borderBottomWidth: 1,
+    borderBottomColor: "#fff",
+    color: "#fff",              
+    paddingVertical: 8,
+    marginBottom: 20,
+    
+  },
+  buttonContainer: { 
+    width: '100%', 
+    marginTop: 10,
+    letterSpacing: 2,
+    fontWeight: "900",
+  },
+  noticeBox: {
     backgroundColor: '#d4edda',
     padding: 12,
     borderRadius: 8,

@@ -132,7 +132,7 @@ const HomeScreen = () => {
 
   return (
     <GradientBackground>
-    <Screen >
+    <Screen>
       <Text style={styles.text}>Login Successful!</Text>
       
 
