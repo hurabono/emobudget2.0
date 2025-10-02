@@ -48,7 +48,7 @@ export default function AppTabsLayout() {
       <Tabs.Screen
         name="PlaidLinkScreen"
         options={{
-          href: null,   // 👈 이게 핵심: 탭 바에서 보이지 않음
+          href: null, 
         }}
       />
 
