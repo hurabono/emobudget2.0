@@ -134,7 +134,9 @@ const HomeScreen = () => {
     <GradientBackground>
     <Screen>
       <Text style={styles.text}>Login Successful!</Text>
-      
+      <Text style={styles.email}>
+          {authContext?.userEmail ?? "Unknown user"}
+        </Text>
 
       {/* 상단: 가장 가까운 지출 1개만 표시 */}
       {nextExpense && (
@@ -193,6 +195,14 @@ const styles = StyleSheet.create({
   buttonContainer: { width: '100%', marginTop: 10 },
   highlightBox: { padding: 16, backgroundColor: '#fff3cd', borderRadius: 8, marginBottom: 20 },
   bigExpenseWarning: { marginTop: 8, color: 'red', fontWeight: 'bold' },
+  email: {
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#fff',      // 배경 위에서 보이게 흰색
+    fontWeight: '600',
+  },
 });
 
 export default HomeScreen;
