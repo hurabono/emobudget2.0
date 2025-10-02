@@ -6,7 +6,7 @@ import GradientBackground from '../components/GradientBackground';
 import { AuthContext, AuthProvider } from '../context/AuthContext';
 import './global.css';
 
-// ✅ 추가: 폰트 로드 (Roboto Flex + Inria Serif)
+// 추가: 폰트 로드 (Roboto Flex + Inria Serif)
 import {
   RobotoFlex_400Regular,
   useFonts as useRobotoFlex,
