@@ -1,3 +1,4 @@
+import Card from "@/components/ui/Card";
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -16,15 +17,15 @@ const EmotionalSpendingAnalysis = ({ analysisText }: EmotionalSpendingAnalysisPr
   const patterns = analysisLines.slice(1);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>AI 감정 소비 분석 🧐</Text>
-      <Text style={styles.summaryText}>{title}</Text>
+    <Card className="mt-6">
+      <Text className='font-flex text-2xl text-brand-blush font-bold tracking-wide mb-4'>Emotional Spending List </Text>
+      <Text className="font-flex text-base text-brand-lilac mb-4">{title}</Text>
       <View style={styles.patternsContainer}>
         {patterns.map((line, index) => (
-          line.trim() ? <Text key={index} style={styles.patternItem}>{line}</Text> : null
+          line.trim() ? <Text className="font-flex text-brand-lilac text-sm" key={index} style={styles.patternItem}>{line}</Text> : null
         ))}
       </View>
-    </View>
+    </Card>
   );
 };
 
@@ -62,13 +63,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   patternItem: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 8,
+    fontSize: 12,
+    marginBottom: 12,
     lineHeight: 22,
     paddingLeft: 10,
     borderLeftWidth: 3,
-    borderLeftColor: '#3498db',
+    borderLeftColor: '#8F8AA6',
   },
 });
 

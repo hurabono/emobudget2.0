@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import apiClient from '../../api';
-import EmotionalSpendingAnalysis from '../../components/EmotionalSpendingAnalysis';
 import GradientBackground from '../../components/GradientBackground';
 import SpendingAnalysis from '../../components/SpendingAnalysis';
 import { AuthContext } from '../../context/AuthContext';
@@ -134,7 +133,7 @@ const TransactionsScreen = () => {
     };
   }, [token]);
 
-  // accountId → nickname 빠른 매칭을 위한 맵
+  // accountId >>  nickname mapping
   const accountMap = useMemo(() => {
     const map: Record<string, string> = {};
     accounts.forEach((a) => {
@@ -206,7 +205,7 @@ const TransactionsScreen = () => {
               <View style={styles.header}>
                 <Text style={styles.headerTitle}>소비 내역 및 분석</Text>
               </View>
-              <EmotionalSpendingAnalysis analysisText={data.emotionalSpendingPattern} />
+
               <SpendingAnalysis transactions={data.transactions} />
               <Text style={styles.listTitle}>최근 거래 내역</Text>
             </>
