@@ -1,5 +1,6 @@
 // app/(app)/HomeScreen.tsx
 import Screen from '@/components/Screen';
+import Card from "@/components/ui/Card";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import apiClient from '../../api';
 import AccountSection from '../../components/AccountSection';
 import GradientBackground from '../../components/GradientBackground';
 import { AuthContext } from '../../context/AuthContext';
+
 
 interface Transaction {
   name: string;
@@ -21,14 +23,15 @@ interface ImportantExpense {
   name: string;
   amount: number;
   dueDate: string;
+  advice?: string;
 }
 
 const HomeScreen = () => {
   const authContext = useContext(AuthContext);
   const router = useRouter();
   const [data, setData] = useState<{ transactions: Transaction[] } | null>(null);
-  
   const [expenses, setExpenses] = useState<ImportantExpense[]>([]);
+
   
 
   useEffect(() => {
@@ -59,10 +62,10 @@ const HomeScreen = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+    };
 
-  fetchNextExpense();
-}, [authContext?.userToken]);
+    fetchNextExpense();
+  }, [authContext?.userToken]);
 
 
 
@@ -143,21 +146,23 @@ const HomeScreen = () => {
 
         {/* 상단: 가장 가까운 지출 1개만 표시 */}
         {nextExpense && (
-          <View style={styles.highlightBox}>
-            <Text>
-              {nextExpense.name} - ${nextExpense.amount} (📅 {nextExpense.dueDate})
+          <Card>
+            <Text className='font-flex text-2xl text-brand-blush font-bold tracking-wide mb-4'>Upcoming expense </Text>
+
+            <Text className='font-flex text-white text-lg tracking-wide'>
+              {nextExpense.dueDate} : {nextExpense.name} - ${nextExpense.amount}
             </Text>
-            <Text>
-              {generateAdvice(nextExpense, data?.transactions || [])}
+            <Text className='text-white font-flex tracking-wide'>
+              {nextExpense.advice ?? generateAdvice(nextExpense, data?.transactions || [])}
             </Text>
 
             {/* 💡 1000달러 이상이면 추가 경고 */}
             {nextExpense.amount >= 1000 && (
-              <Text style={styles.bigExpenseWarning}>
+              <Text className='text-brand-lilac font-flex tracking-wide mt-3'>
                 ⚠️ 곧 큰 금액(${nextExpense.amount})이 빠져나갈 예정입니다.
               </Text>
             )}
-          </View>
+          </Card>
         )}
 
 
