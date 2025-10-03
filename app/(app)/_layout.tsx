@@ -8,13 +8,13 @@ export default function AppTabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#FBCBC9",
+          backgroundColor: "#F7DFE0",
           borderTopWidth: 0,
-          height: 65,
-          paddingBottom: 8,
-          paddingTop:8
+          height: 80,
+          paddingBottom: 0,
+          paddingTop:10
         },
-        tabBarActiveTintColor: "#040305",
+        tabBarActiveTintColor: "#79758E",
         tabBarInactiveTintColor: "#8F8AA6",
       }}
     >
