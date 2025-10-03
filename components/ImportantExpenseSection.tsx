@@ -1,7 +1,7 @@
 // components/ImportantExpenseSection.tsx
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform } from "react-native";
 import * as Notifications from "expo-notifications";
+import React, { useEffect, useState } from "react";
+import { Button, FlatList, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import apiClient from "../api";
 
 // Expo SDK 50+
@@ -75,14 +75,14 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
 
     await scheduleAtDate(
       twoWeeksBefore,
-      "다가오는 지출",
-      `${exp.name} - $${exp.amount} (2주 뒤 예정)`
+      "Upcoming Expense",
+      `${exp.name} - $${exp.amount} (Planned after 2weeks)`
     );
 
     await scheduleAtDate(
       due,
-      "오늘 지출일!",
-      `${exp.name} - $${exp.amount} 결제 예정`
+      "Today Expense!",
+      `${exp.name} - $${exp.amount} will be charged`
     );
   }
 
@@ -103,15 +103,15 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
       .reduce((s, tx) => s + tx.amount, 0);
 
     if (expense.amount >= 1000 && recentSpending >= 700) {
-      return `🚨 예정 지출 ${expense.name} 대비 최근 소비가 많습니다. 이번 주 소비를 줄이세요!`;
+      return `Spending More Recent Spending Compared to Planned Spending ${expense.name}. Cut Spending This Week!`;
     }
     if (expense.amount <= 500 && recentSpending <= 300) {
-      return `✅ 예정 지출 ${expense.name} 대비 여유 있는 상태입니다 👍`;
+      return `We are in a relaxed state compared to the estimated expenditure of ${expense.name}`;
     }
     if (weekendShops >= 200) {
-      return `📊 ${expense.name} 납부 전 주말 쇼핑에 $${weekendShops} 사용, 주의하세요.`;
+      return `${expense.name} Use $${weekendShops} for weekend shopping before payment, be warned.`;
     }
-    return `다가오는 ${expense.name} 대비 특별한 문제는 없습니다.`;
+    return `There are no specific issues for the upcoming ${expense.name}.`;
   }
 
   // 추가(POST) → 저장 후 /me 재조회 → 단말 알림 예약
@@ -146,7 +146,7 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
       (async () => {
         const { status } = await Notifications.requestPermissionsAsync();
         if (status !== "granted") {
-          alert("알림 권한이 필요합니다 🚨");
+          alert("You need permission for notification");
         }
       })();
     }
@@ -158,24 +158,24 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="지출명 (예: 렌트)"
+        placeholder="Expense (e.g. Rent)"
         value={name}
         onChangeText={setName}
       />
       <TextInput
         style={styles.input}
-        placeholder="금액 (USD)"
+        placeholder="Amount of Money"
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount}
       />
       <TextInput
         style={styles.input}
-        placeholder="날짜 (YYYY-MM-DD)"
+        placeholder="dates (YYYY-MM-DD)"
         value={dueDate}
         onChangeText={setDueDate}
       />
-      <Button title="추가" onPress={addExpense} />
+      <Button title="Add" onPress={addExpense} />
 
       <FlatList
         data={expenses}

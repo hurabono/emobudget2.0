@@ -84,11 +84,11 @@ const HomeScreen = () => {
       }, 0);
 
     if (expense.amount >= 1000 && recentSpending >= 700) {
-      return `🚨 예정 지출 ${expense.name} 대비 최근 소비가 많습니다. 이번 주 소비를 줄이세요!`;
+      return `Spending More Recent Spending Compared to Planned Spending ${expense.name}. Cut Spending This Week!`;
     }
 
     if (expense.amount <= 500 && recentSpending <= 300) {
-      return `✅ 예정 지출 ${expense.name} 대비 여유 있는 상태입니다 👍`;
+      return `We are in a relaxed state compared to the estimated expenditure of ${expense.name}`;
     }
 
     const lastWeekendSpending = transactions
@@ -100,10 +100,10 @@ const HomeScreen = () => {
       .reduce((sum, tx) => sum + tx.amount, 0);
 
     if (lastWeekendSpending >= 200) {
-      return `📊 ${expense.name} 납부 전 주말 쇼핑에 $${lastWeekendSpending} 사용, 주의하세요.`;
+      return `${expense.name} Use $${lastWeekendSpending} for weekend shopping before payment, be warned.`;
     }
 
-    return `다가오는 ${expense.name} 대비 특별한 문제는 없습니다.`;
+    return `There are no specific issues for the upcoming ${expense.name}.`;
   }
 
   // 📌 가장 가까운 예정 지출 1개만 가져오기
@@ -159,7 +159,7 @@ const HomeScreen = () => {
             {/* 💡 1000달러 이상이면 추가 경고 */}
             {nextExpense.amount >= 1000 && (
               <Text className='text-brand-lilac font-flex tracking-wide mt-3'>
-                ⚠️ 곧 큰 금액(${nextExpense.amount})이 빠져나갈 예정입니다.
+                A large amount of ${nextExpense.amount} will be withdrawn.
               </Text>
             )}
           </Card>
