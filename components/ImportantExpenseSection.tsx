@@ -145,14 +145,18 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
             item.id ? String(item.id) : `${item.name}-${item.dueDate}-${item.amount}-${idx}`
           }
           renderItem={({ item }) => (
+
             <View style={styles.expenseItem}>
               <Text className="font-flex text-lg mb-2 text-white" >{item.name} - ${item.amount}</Text>
               <Text className="font-flex text-base text-white">
                 {item.dueDate}
               </Text>
-              <Text className="font-flex" style={styles.advice}>{generateAdvice(item, transactions)}</Text>
+            
+              <Text className="font-flex" style={styles.advice}>
+                {item.advice ?? generateAdvice(item, transactions)}
+              </Text>
 
-              {/* ✅ 삭제 아이콘 버튼 */}
+              {/* 삭제 아이콘 버튼 */}
               {item.id && (
                 <TouchableOpacity
                   style={styles.deleteButton}

@@ -132,8 +132,8 @@ const AccountSection = () => {
 const styles = StyleSheet.create({
   container: { marginTop: 20 },
   card: {
-    width: width * 0.7,
-    height: height * 0.25,
+    width: 301,
+    height:233,
     marginLeft: 20,
     borderRadius: 15,
     padding: 20,

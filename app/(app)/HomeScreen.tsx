@@ -2,6 +2,7 @@
 import Screen from '@/components/Screen';
 import Card from "@/components/ui/Card";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import EmotionalSpendingAnalysis from '../../components/EmotionalSpendingAnalysi
 import GradientBackground from '../../components/GradientBackground';
 import Button from "../../components/ui/Button";
 import { AuthContext } from '../../context/AuthContext';
+
 
 interface Transaction {
   name: string;
@@ -44,40 +46,62 @@ interface Account {
 const HomeScreen = () => {
   const authContext = useContext(AuthContext);
   const router = useRouter();
-
-  // ✅ 그대로 유지 (generateAdvice에서 참조)
   const [data, setData] = useState<{ transactions: Transaction[] } | null>(null);
   const [expenses, setExpenses] = useState<ImportantExpense[]>([]);
   const [dataApi, setDataApi] = useState<ApiResponse | null>(null); // ✅ 감정 분석/거래 응답 저장
   const token = authContext?.userToken;
   const [accounts, setAccounts] = useState<Account[]>([]);
-
+  const [focusKey, setFocusKey] = useState(0);
+  // ---------test-----------------------
   const IS_TEST_MODE = true;
 
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      setFocusKey(k => k + 1);
+      return undefined;
+    }, [])
+  );
 
   // 감정 분석 + 거래 목록 한번에 로드 (TransactionsScreen의 소스와 동일한 엔드포인트)
-useEffect(() => {
-  let alive = true;
-  (async () => {
-    try {
-      const endpoint = IS_TEST_MODE
-        ? '/api/analysis/spending-pattern?test=true'
-        : '/api/analysis/spending-pattern';
+ useEffect(() => {
+    let alive = true;
 
-      const res = await apiClient.get<ApiResponse>(endpoint, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        timeout: 15000,
-      });
-      if (!alive) return;
+    (async () => {
+      try {
+        const endpoint = IS_TEST_MODE
+          ? '/api/analysis/spending-pattern?test=true'
+          : '/api/analysis/spending-pattern';
 
-      setDataApi(res.data);
-      setData({ transactions: res.data.transactions || [] });
-    } catch (e) {
-      console.error('❌ 홈 감정/거래 로드 실패:', e);
-    }
-  })();
-  return () => { alive = false; };
-}, [token, IS_TEST_MODE]);
+        const res = await apiClient.get<ApiResponse>(endpoint, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          timeout: 45000, // 🔼 45s로 여유
+        });
+
+        if (!alive) return;
+        setDataApi(res.data);
+        setData({ transactions: res.data.transactions || [] });
+      } catch (e) {
+        console.error('❌ 홈 감정/거래 로드 실패(실모드):', e);
+
+        // 폴백: 테스트 데이터 재시도
+        try {
+          const fb = await apiClient.get<ApiResponse>(
+            '/api/analysis/spending-pattern?test=true',
+            { timeout: 15000 }
+          );
+          if (!alive) return;
+          setDataApi(fb.data);
+          setData({ transactions: fb.data.transactions || [] });
+          console.log('🔁 테스트 데이터 폴백 성공');
+        } catch (ee) {
+          console.error('❌ 테스트 데이터 폴백도 실패:', ee);
+        }
+      }
+    })();
+
+    return () => { alive = false; };
+  }, [token, IS_TEST_MODE, focusKey]);
 
 
   // 가장 가까운 지출 1개 > Important Expense
@@ -107,7 +131,7 @@ useEffect(() => {
       }
     };
     if (token) fetchNextExpense();
-  }, [token]);
+  }, [token, focusKey]);
 
 
 
@@ -126,7 +150,7 @@ useEffect(() => {
     }
   })();
   return () => { alive = false; };
-}, [token]);
+}, [token, focusKey]);
 
 
 
@@ -237,7 +261,7 @@ useEffect(() => {
           </Card>
         )}
 
-        <AccountSection />
+        <AccountSection key={focusKey} />
 
         <View style={{ marginTop: 12, alignItems: "flex-end" }}>
                 <TouchableOpacity onPress={() => router.push("/AccountSelectionScreen")}>
