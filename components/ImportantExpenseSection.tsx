@@ -1,8 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import apiClient from "../api";
+import Button from "../components/ui/Button";
+
 
 // Expo SDK 50+ notification handler
 Notifications.setNotificationHandler({
@@ -18,7 +20,7 @@ interface ImportantExpenseBase {
   id?: number | string;
   name: string;
   amount: number;
-  dueDate: string; // ISO
+  dueDate: string;
 }
 interface ImportantExpenseDTO extends ImportantExpenseBase {
   advice?: string;
@@ -27,7 +29,7 @@ interface ImportantExpenseDTO extends ImportantExpenseBase {
 interface Transaction {
   name: string;
   amount: number;
-  date: string; // ISO
+  date: string;
   category: string;
 }
 
@@ -55,15 +57,17 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
     fetchExpenses();
   }, []);
 
+
   // 삭제 함수
   const handleDelete = async (id: number | string) => {
     try {
       await apiClient.delete(`/api/expenses/${id}`);
-      await fetchExpenses(); // 삭제 후 새로고침
+      await fetchExpenses(); 
     } catch (e) {
       console.error("❌ Failed to delete expense:", e);
     }
   };
+
 
   // (폴백) 클라이언트 조언
   function generateAdvice(expense: ImportantExpenseBase, txs: Transaction[]): string {
@@ -108,13 +112,14 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>💰 중요 지출 관리</Text>
+      <Text style={styles.header}>Important Expense</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Expense (e.g. Rent)"
         value={name}
         onChangeText={setName}
+        className='focus:outline-none'
       />
       <TextInput
         style={styles.input}
@@ -122,26 +127,30 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount}
+        className='focus:outline-none'
       />
       <TextInput
         style={styles.input}
         placeholder="dates (YYYY-MM-DD)"
         value={dueDate}
         onChangeText={setDueDate}
+        className='focus:outline-none'
       />
-      <Button title="Add" onPress={addExpense} />
+      <Button label="Add" onPress={addExpense} />
 
       <FlatList
+          className="mt-10"
           data={expenses}
           keyExtractor={(item, idx) =>
             item.id ? String(item.id) : `${item.name}-${item.dueDate}-${item.amount}-${idx}`
           }
           renderItem={({ item }) => (
             <View style={styles.expenseItem}>
-              <Text>
-                {item.name} - ${item.amount} (📅 {item.dueDate})
+              <Text className="font-flex text-lg mb-2 text-white" >{item.name} - ${item.amount}</Text>
+              <Text className="font-flex text-base text-white">
+                {item.dueDate}
               </Text>
-              <Text style={styles.advice}>{generateAdvice(item, transactions)}</Text>
+              <Text className="font-flex" style={styles.advice}>{generateAdvice(item, transactions)}</Text>
 
               {/* ✅ 삭제 아이콘 버튼 */}
               {item.id && (
@@ -149,7 +158,7 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
                   style={styles.deleteButton}
                   onPress={() => handleDelete(item.id!)}
                 >
-                  <Ionicons name="close-circle" size={20} color="red" />
+                  <Ionicons style={{ color: "#FBCBC9" }} name="close-circle" size={20} />
                 </TouchableOpacity>
               )}
             </View>
@@ -160,15 +169,54 @@ const ImportantExpenseSection: React.FC<Props> = ({ transactions }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#fff", marginTop: 20, borderRadius: 8 },
-  header: { fontSize: 20, fontWeight: "bold", marginBottom: 12 },
-  input: { borderWidth: 1, borderColor: "#ddd", padding: 8, marginBottom: 10, borderRadius: 6 },
-  expenseItem: { marginVertical: 8, padding: 10, backgroundColor: "#f9f9f9", borderRadius: 6 },
-  advice: { marginTop: 4, fontSize: 14, color: "#555" },
-  deleteButton: {
-   position: "absolute",
-  top: 5,
-  right: 5,
+  container: { 
+    padding: 16, 
+    backgroundColor: "transparent ", 
+    marginTop: 20, 
+    
+  },
+  header: {     
+    fontSize: 25,          
+    fontWeight: "bold",
+    color: "#fff", 
+    textAlign: "left",
+    marginBottom: 25,
+    textShadowColor: "rgba(255, 255, 255, 0.9)", 
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,      
+  },
+  input: { 
+    width: '100%', 
+    height: 50, 
+    borderBottomWidth: 1,
+    borderBottomColor: "#fff",
+    color: "#fff",              
+    paddingVertical: 8,
+    marginBottom: 20,
+    fontSize:20,
+  },
+
+  expenseItem: { 
+    marginVertical: 10, 
+    padding: 10, 
+    backgroundColor: "#79758E", 
+    borderRadius: 10, 
+    borderColor:"#93A9D1",
+    borderWidth:3
+
+  },
+
+    advice: 
+    { 
+      marginTop: 4, 
+      fontSize: 14, 
+      color: "#fafafa" 
+    },
+
+    deleteButton: {
+    position: "absolute",
+    top: 5,
+    right: 5,
 },
 deleteButtonText: {
   color: "white",

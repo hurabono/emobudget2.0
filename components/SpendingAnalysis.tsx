@@ -1,6 +1,6 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
 
 // 이 컴포넌트가 사용할 데이터 타입을 다시 정의합니다.
 // 이제 TransactionScreen으로부터 원본 거래 내역 배열을 직접 받습니다.
@@ -32,7 +32,7 @@ const SpendingAnalysis = ({ transactions }: SpendingAnalysisProps) => {
   if (!transactions || transactions.length === 0) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>소비 카테고리 분석</Text>
+        <Text className='font-flex' style={styles.title}>소비 카테고리 분석</Text>
         <Text style={styles.noDataText}>분석할 소비 데이터가 없습니다.</Text>
       </View>
     );
@@ -68,31 +68,33 @@ const SpendingAnalysis = ({ transactions }: SpendingAnalysisProps) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Top 5 소비 카테고리</Text>
-      <Text style={styles.summaryText}>
-        가장 많이 지출한 카테고리는 '{topCategory}' 입니다.
+      <Text className='font-flex text-brand-blush ' style={styles.title}>Top 5 Spending Categories</Text>
+      <Text className='font-flex text-sm text-brand-lilac tracking-widest' style={styles.summaryText}>
+       The most spent category is '{topCategory}'.
       </Text>
-      <Text style={styles.summaryText}>
-        총 지출 금액: ${totalSpending.toFixed(2)}
+      <Text className='font-flex text-base text-brand-lilac tracking-widest' style={styles.summaryText}>
+        Total spending price: ${totalSpending.toFixed(2)}
       </Text>
       <View style={styles.chartContainer}>
         {spendingData.map(item => (
           <View key={item.name} style={styles.barRow}>
-            <Text style={styles.barLabel} numberOfLines={1}>
+            <Text className='font-flex text-brand-blush' style={styles.barLabel} numberOfLines={1}>
               {item.name}
             </Text>
             <View style={styles.barWrapper}>
-              <View
+              <LinearGradient
+                colors={['#79758E', '#FBCBC9']} // 시작색 ~ 끝색
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
                 style={[
                   styles.bar,
                   {
                     width: maxSpending > 0 ? `${(item.amount / maxSpending) * 100}%` : '0%',
-                    backgroundColor: generateColor(item.name),
                   },
                 ]}
               />
             </View>
-            <Text style={styles.barAmount}>${item.amount.toFixed(2)}</Text>
+            <Text className='font-flex text-brand-blush' style={styles.barAmount}>${item.amount.toFixed(2)}</Text>
           </View>
         ))}
       </View>
@@ -104,7 +106,7 @@ const SpendingAnalysis = ({ transactions }: SpendingAnalysisProps) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#2e2e2eff',
     marginHorizontal: 16,
     marginTop: 16,
     marginBottom: 8,

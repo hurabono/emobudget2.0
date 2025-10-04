@@ -176,7 +176,7 @@ useEffect(() => {
         anyT.accountId !== 'NO_ACCOUNT' &&
         accountMap[anyT.accountId]
           ? accountMap[anyT.accountId]
-          : '계좌 정보 없음'
+          : 'No account information'
       )
     );
   }
@@ -208,10 +208,11 @@ useEffect(() => {
   };
 
   return (
-    <GradientBackground>
-      <Screen>
+    <GradientBackground >
+      <Screen style={styles.container}>
+        <Text style={styles.header}>EMOBUDGET</Text>
         <View className='flex flex-row mb-5'>
-          <Ionicons name="cloud-outline" size={35} color="white" />
+          <Ionicons name="cloud-outline" size={25} color="white" />
           <Text className='font-lg font-flex tracking-wider' style={styles.email}>
             Hi {authContext?.userEmail ?? "Unknown user"}
           </Text>
@@ -264,15 +265,18 @@ useEffect(() => {
                         start={{ x: 0, y: 2 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.txRow}
+                        key={`${(t as any).accountId ?? 'noacct'}-${t.name}-${t.date}-${t.amount}-${idx}`}
                       >
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.txName}>{t.name}</Text>
-                  <Text style={styles.txSub}>
+                  <View style={{ flex: 1 }}>
+                  <Text className='font-flex' style={styles.txName}>{t.name}</Text>
+                  <Text className='font-flex' style={styles.txSub}>{t.date}</Text>
+                </View>
+
+                <Text style={styles.txSub}>
                   {t.date} · {getAccountNickname(t)}
                 </Text>
                 </View>
-
-                
 
                 <Text style={t.amount > 0 ? styles.txMinus : styles.txPlus}>
                   {t.amount > 0 ? '- ' : '+ '}${Math.abs(t.amount).toFixed(2)}
@@ -311,8 +315,13 @@ useEffect(() => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: 20 
+    
   },
+
   text: { fontSize: 20, color: '#333', marginBottom: 20 },
   buttonContainer: { width: '100%', marginTop: 10 },
   highlightBox: { padding: 16, backgroundColor: '#fff3cd', borderRadius: 8, marginBottom: 20 },
@@ -320,6 +329,17 @@ const styles = StyleSheet.create({
   email: {
     textAlign: 'center', fontSize: 18, color: '#fff', marginLeft: 18,
     display: 'flex', justifyContent: 'center', alignItems: 'center'
+  },
+  header: {     
+    fontSize: 25,          
+    fontWeight: "bold",
+    color: "#fff", 
+    textAlign: "left",
+    marginBottom: 10,
+    marginTop:20,
+    textShadowColor: "rgba(255, 255, 255, 0.9)", 
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,      
   },
   txRow: {
   paddingVertical: 10,

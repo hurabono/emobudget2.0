@@ -1,6 +1,7 @@
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import apiClient from "../../api"; // 기존 axios client
-import { useRouter } from "expo-router";
+
 
 interface Account {
   accountId: string;
@@ -50,7 +51,7 @@ const AccountSelectionScreen = () => {
   // 선택한 계좌 저장
   const handleContinue = async () => {
     try {
-      // ✅ 서버는 {id, nickname} 형태 기대 → 변환
+      // 서버는 {id, nickname} 형태 기대  변환
       const payload = selectedAccounts.map((acc) => ({
         id: acc.accountId,
         nickname: acc.nickname || acc.name,

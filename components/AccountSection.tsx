@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import apiClient from "../api";
-import { AuthContext } from "../context/AuthContext"; // ✅ 추가
+import { AuthContext } from "../context/AuthContext";
 
 interface Account {
   accountId: string;
@@ -27,20 +27,21 @@ const AccountSection = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const auth = useContext(AuthContext);                    // ✅ 추가
-  const token = auth?.userToken;                           // ✅ 추가
+  const auth = useContext(AuthContext);
+  const token = auth?.userToken;  
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
         const response = await apiClient.get<Account[]>("/accounts/selected", {
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined, // ✅ 핵심
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined, 
           timeout: 15000,
         });
         console.log("📌 /accounts/selected 응답:", JSON.stringify(response.data, null, 2));
         setAccounts(response.data || []);
       } catch (err) {
         console.error("계좌 불러오기 실패:", err);
+
         // 실패 시엔 빈 배열 유지 → 디폴트 카드가 보이도록
         setAccounts([]);
       } finally {
@@ -48,8 +49,8 @@ const AccountSection = () => {
       }
     };
     fetchAccounts();
-  }, [token]); // ✅ 토큰 바뀌면 재조회
-
+  }, [token]);
+  
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -58,7 +59,7 @@ const AccountSection = () => {
     );
   }
 
-  // 🔹 계좌가 하나도 없을 때: 디폴트 카드 + Link my account
+  //계좌가 하나도 없을 때: 디폴트 카드 + Link my account
   if (accounts.length === 0) {
     return (
       <View style={styles.container}>
@@ -110,14 +111,14 @@ const AccountSection = () => {
             <Text style={styles.cardTitle}>{item.nickname}</Text>
             <View style={styles.line} />
 
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems:"center" }}>
               <Text style={styles.balance}>${item.currentBalance.toLocaleString()}</Text>
               <Text style={styles.subBalance}>Available ${item.availableBalance.toLocaleString()}</Text>
             </View>
 
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8 }}>
               <TouchableOpacity onPress={() => router.push("/PlaidLinkScreen")}>
-                <Text style={styles.linkText}>Link my account</Text>
+                <Text style={styles.linkText}>Link other account</Text>
               </TouchableOpacity>
               <Text style={styles.cardFooter}>Card {item.mask}</Text>
             </View>
@@ -140,17 +141,59 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 4,
     justifyContent: "space-between",
+    borderWidth:1,
+    borderColor:'#79758E'
   },
-  accountType: { fontSize: 14, color: "#eee", alignSelf: "flex-end" },
-  cardTitle: { fontSize: 18, fontWeight: "700", color: "#fff", marginBottom: 8 },
-  line: { height: 1, backgroundColor: "rgba(255,255,255,0.5)", marginVertical: 8 },
-  balance: { fontSize: 28, fontWeight: "bold", color: "#fff", marginBottom: 6 },
-  subBalance: { fontSize: 16, color: "#eee", marginBottom: 10 },
-  cardFooter: { fontSize: 14, color: "#ddd", alignSelf: "flex-end" },
-  linkText: { fontSize: 14, color: "#fff", textDecorationLine: "underline" },
-  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  emptyContainer: { padding: 20, alignItems: "center" },
-  emptyText: { fontSize: 14, color: "#666" },
+  accountType: { 
+    fontSize: 14, 
+    color: "#eee", 
+    alignSelf: "flex-end" 
+  },
+  cardTitle: { 
+    fontSize: 20, 
+    fontWeight: "700", 
+    color: "#fff", 
+    marginBottom: 2
+  },
+  line: { 
+    height: 1, 
+    backgroundColor: "rgba(255,255,255,0.5)", 
+    marginVertical: 8 
+  },
+  balance: { 
+    fontSize: 25, 
+    fontWeight: "bold", 
+    color: "#fff", 
+    marginBottom: 6 
+  },
+  subBalance: { 
+    fontSize: 14, 
+    color: "#eee", 
+    marginBottom: 10 
+  },
+  cardFooter: { 
+    fontSize: 14, 
+    color: "#ddd", 
+    alignSelf: "flex-end" 
+  },
+  linkText: { 
+    fontSize: 14, 
+    color: "#fff", 
+    textDecorationLine: "underline" 
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center" 
+  },
+  emptyContainer: { 
+    padding: 20, 
+    alignItems: "center" 
+  },
+  emptyText: { 
+    fontSize: 14, 
+    color: "#666" 
+  },
 });
 
 export default AccountSection;

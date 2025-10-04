@@ -10,7 +10,7 @@ module.exports = {
         brand: {
           blue:  "#93A9D1",
           blush: "#FBCBC9",
-          ink:   "#040305",
+          ink:   "#2e2e2eff",
           lilac: "#E4E1EC",
           peach: "#F7DFE0",
           dim:   "#79758E",
@@ -23,7 +23,7 @@ module.exports = {
           tint:    "#E4E1EC",
         },
         txt: {
-          DEFAULT: "#040305",
+          DEFAULT: "#2e2e2eff",
           dim:     "#79758E",
           mute:    "#8F8AA6",
         },

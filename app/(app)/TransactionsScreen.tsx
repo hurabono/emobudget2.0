@@ -1,4 +1,5 @@
 // app/(app)/TransactionsScreen.tsx
+import Screen from '@/components/Screen';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -22,7 +23,6 @@ interface Transaction {
   category: string;
   accountId: string | null; 
   transactionTime?: string | null;
-
   accountName?: string;
   accountMask?: string;
   accountNickname?: string;
@@ -51,7 +51,7 @@ const TransactionsScreen = () => {
   // 필요 시 true로 바꿔 테스트 고정 사용
   const IS_TEST_MODE = true;
 
-  // ✅ 실제 호출 시 인증 헤더가 필요할 수 있으므로 토큰 사용 (추가)
+  // 실제 호출 시 인증 헤더가 필요할 수 있으므로 토큰 사용 (추가)
   const auth = useContext(AuthContext);
   const token = auth?.userToken || null;
 
@@ -65,7 +65,7 @@ const TransactionsScreen = () => {
           ? '/api/analysis/spending-pattern?test=true'
           : '/api/analysis/spending-pattern';
 
-        // ✅ 실제 모드면 Authorization 헤더와 타임아웃 추가
+        // 실제 모드면 Authorization 헤더와 타임아웃 추가
         const response = await apiClient.get<ApiResponse>(endpoint, {
           headers: !IS_TEST_MODE && token ? { Authorization: `Bearer ${token}` } : undefined,
           timeout: 20000, // 서버 웜업/지연 대비
@@ -75,14 +75,14 @@ const TransactionsScreen = () => {
         setData(response.data);
 
         // 디버그 로그
-        console.log('✅ [analysis] 응답 전체:', response.data);
-        console.log('✅ [analysis] 첫 거래 샘플:', response.data.transactions?.[0]);
+        console.log('[analysis] 응답 전체:', response.data);
+        console.log('[analysis] 첫 거래 샘플:', response.data.transactions?.[0]);
         const nullIdCount = (response.data.transactions || []).filter((t) => !t.accountId).length;
         console.log(`⚠️ [analysis] accountId가 비어있는 거래 수: ${nullIdCount} / ${response.data.transactions?.length || 0}`);
       } catch (error: any) {
         console.error('❌ 분석/거래 불러오기 실패(실모드 시도):', error?.code || error?.message || error);
 
-        // ✅ 폴백: 실모드 실패/타임아웃이면 즉시 테스트 데이터로 재시도 (추가)
+        // 폴백: 실모드 실패/타임아웃이면 즉시 테스트 데이터로 재시도 (추가)
         if (!IS_TEST_MODE) {
           try {
             const fallback = await apiClient.get<ApiResponse>(
@@ -150,16 +150,16 @@ const TransactionsScreen = () => {
       || item.accountName
       || ((item.accountId && item.accountId !== 'NO_ACCOUNT' && accountMap[item.accountId])
           ? accountMap[item.accountId]
-          : '계좌 정보 없음');
+          : 'No account information');
 
     const amountIsExpense = item.amount > 0;
 
     return (
       <View style={styles.itemContainer}>
         <View style={styles.itemTextContainer}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemDate}>{item.date}</Text>
-          <Text style={styles.itemAccount}>계좌: {nickname}</Text>
+          <Text className='font-flex text-brand-blush' style={styles.itemName}>{item.name}</Text>
+          <Text className='font-flex text-brand-blush' style={styles.itemDate}>{item.date}</Text>
+          <Text className='font-flex text-brand-lilac' style={styles.itemAccount}>Account: {nickname}</Text>
         </View>
 
         <Text
@@ -186,13 +186,14 @@ const TransactionsScreen = () => {
   if (!data || !data.transactions || data.transactions.length === 0) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>거래 내역이 없습니다.</Text>
+        <Text>There is no transaction history.</Text>
       </View>
     );
   }
 
   return (
     <GradientBackground>
+      <Screen>
       <SafeAreaView style={styles.container}>
         <FlatList
           data={data.transactions}
@@ -202,28 +203,52 @@ const TransactionsScreen = () => {
           renderItem={renderTransactionItem}
           ListHeaderComponent={() => (
             <>
-              <View style={styles.header}>
-                <Text style={styles.headerTitle}>소비 내역 및 분석</Text>
+              <View>
+                <Text style={styles.headerTitle}>Transaction List</Text>
               </View>
 
-              <SpendingAnalysis transactions={data.transactions} />
-              <Text style={styles.listTitle}>최근 거래 내역</Text>
+              <SpendingAnalysis  transactions={data.transactions} />
+
             </>
           )}
         />
       </SafeAreaView>
+      </Screen>
     </GradientBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent', position: 'relative', zIndex: 100, ...Platform.select({ android: { elevation: 1 } }) },
-  header: { padding: 20 },
-  headerTitle: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#111' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  listTitle: { fontSize: 20, fontWeight: '700', color: '#333', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10, backgroundColor: 'transparent' },
+  container: { 
+    flex: 1, 
+    backgroundColor: 'transparent', 
+    position: 'relative', 
+    zIndex: 100, 
+    ...Platform.select({ android: { elevation: 1 } }) 
+  },
+  headerTitle: { 
+    fontSize: 25,          
+    fontWeight: "bold",
+    color: "#fff", 
+    textAlign: "left",
+    marginBottom: 10,
+    marginTop:20,
+    paddingLeft:10,
+    textShadowColor: "rgba(255, 255, 255, 0.9)", 
+    textShadowOffset: { 
+      width: 0, 
+      height: 0 
+    },
+    textShadowRadius: 12,  
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+
   itemContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2e2e2eff',
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
@@ -232,17 +257,52 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-      android: { elevation: 3 },
-      web: { borderWidth: 1, borderColor: '#e0e0e0' },
+      ios: { 
+        shadowColor: '#000', 
+        shadowOffset: { 
+          width: 0, 
+          height: 2 
+        }, 
+        shadowOpacity: 0.1, 
+        shadowRadius: 4 
+      },
+      android: { 
+        elevation: 3 
+      },
+      web: { 
+        borderWidth: 1, 
+        borderColor: '#e0e0e0' 
+      },
     }),
   },
-  itemTextContainer: { flex: 1, marginRight: 10 },
-  itemName: { fontSize: 16, fontWeight: '600', color: '#333' },
-  itemDate: { fontSize: 14, color: '#666', marginTop: 4 },
-  itemAccount: { fontSize: 12, color: '#999', marginTop: 2 },
-  itemAmountNegative: { fontSize: 16, fontWeight: 'bold', color: '#e74c3c' },
-  itemAmountPositive: { fontSize: 16, fontWeight: 'bold', color: '#2ecc71' },
+  itemTextContainer: { 
+    flex: 1, 
+    marginRight: 10 
+  },
+  itemName: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    color: '#333' 
+  },
+  itemDate: { 
+    fontSize: 14, 
+    color: '#666', 
+    marginTop: 4 
+  },
+  itemAccount: { 
+    fontSize: 12, 
+    marginTop: 12 
+  },
+  itemAmountNegative: { 
+    fontSize: 16, 
+    fontWeight: 'bold', 
+    color: '#E4E1EC' 
+  },
+  itemAmountPositive: { 
+    fontSize: 16, 
+    fontWeight: 'bold', 
+    color: '#2ecc71' 
+  },
 });
 
 export default TransactionsScreen;
