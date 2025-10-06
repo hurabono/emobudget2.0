@@ -216,7 +216,7 @@ const HomeScreen = () => {
 
   const handleDelete = async () => {
     if (Platform.OS === 'web') {
-      // 웹은 Alert 버튼 콜백이 동작하지 않으므로 confirm/alert 사용
+      // This is for Mobile platform
       const ok = window.confirm('Delete Account\nThis action is irreversible. Continue?');
       if (!ok) return;
 
@@ -235,7 +235,7 @@ const HomeScreen = () => {
       return;
     }
 
-    // 모바일(iOS/Android)은 기존 Alert 로직 유지
+   // this is web
     Alert.alert('Delete Account', 'This action is irreversible. Continue?', [
       { text: 'Cancel', style: 'cancel' },
       {
