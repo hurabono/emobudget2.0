@@ -6,7 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import apiClient from '../../api';
 import AccountSection from '../../components/AccountSection';
 import EmotionalSpendingAnalysis from '../../components/EmotionalSpendingAnalysis';
@@ -54,6 +54,7 @@ const HomeScreen = () => {
   const [focusKey, setFocusKey] = useState(0);
   // ---------test-----------------------
   const IS_TEST_MODE = true;
+  const USE_TEST_DATA = IS_TEST_MODE && accounts.length > 0;
 
   
   useFocusEffect(
@@ -69,7 +70,7 @@ const HomeScreen = () => {
 
     (async () => {
       try {
-        const endpoint = IS_TEST_MODE
+        const endpoint = USE_TEST_DATA
           ? '/api/analysis/spending-pattern?test=true'
           : '/api/analysis/spending-pattern';
 
@@ -85,23 +86,25 @@ const HomeScreen = () => {
         console.error('❌ 홈 감정/거래 로드 실패(실모드):', e);
 
         // 폴백: 테스트 데이터 재시도
+        if (USE_TEST_DATA) {
         try {
           const fb = await apiClient.get<ApiResponse>(
-            '/api/analysis/spending-pattern?test=true',
-            { timeout: 15000 }
-          );
-          if (!alive) return;
-          setDataApi(fb.data);
-          setData({ transactions: fb.data.transactions || [] });
-          console.log('🔁 테스트 데이터 폴백 성공');
-        } catch (ee) {
-          console.error('❌ 테스트 데이터 폴백도 실패:', ee);
+             '/api/analysis/spending-pattern?test=true',
+             { timeout: 15000 }
+           );
+            if (!alive) return;
+            setDataApi(fb.data);
+           setData({ transactions: fb.data.transactions || [] });
+            console.log('🔁 테스트 데이터 폴백 성공');
+          } catch (ee) {
+            console.error('❌ 테스트 데이터 폴백도 실패:', ee);
+          }
         }
       }
     })();
 
     return () => { alive = false; };
-  }, [token, IS_TEST_MODE, focusKey]);
+    }, [token, USE_TEST_DATA, focusKey, accounts.length]);
 
 
   // 가장 가까운 지출 1개 > Important Expense
@@ -149,8 +152,8 @@ const HomeScreen = () => {
       console.error('❌ [/accounts/selected] 불러오기 실패:', e);
     }
   })();
-  return () => { alive = false; };
-}, [token, focusKey]);
+    return () => { alive = false; };
+  }, [token, focusKey]);
 
 
 
@@ -185,7 +188,7 @@ const HomeScreen = () => {
   const map: Record<string, string> = {};
   accounts.forEach(a => {
     if (!a || !a.accountId) return;
-    map[a.accountId] = a.nickname || a.name || '(이름 없음)';
+    map[a.accountId] = a.nickname || a.name || '(no name)';
       });
       return map;
     }, [accounts]);
@@ -212,22 +215,47 @@ const HomeScreen = () => {
     : null;
 
   const handleDelete = async () => {
+    if (Platform.OS === 'web') {
+      // 웹은 Alert 버튼 콜백이 동작하지 않으므로 confirm/alert 사용
+      const ok = window.confirm('Delete Account\nThis action is irreversible. Continue?');
+      if (!ok) return;
+
+      try {
+        await apiClient.delete('/api/auth/delete-account', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        window.alert('Done\nYour account has been deleted.');
+        await authContext?.logout();
+
+        router.replace('/LoginScreen');
+      } catch (e: any) {
+        const msg = e?.response?.data || e?.message || 'Failed to delete account.';
+        window.alert(`Error\n${msg}`);
+      }
+      return;
+    }
+
+    // 모바일(iOS/Android)은 기존 Alert 로직 유지
     Alert.alert('Delete Account', 'This action is irreversible. Continue?', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Delete', style: 'destructive', onPress: async () => {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
           try {
             await apiClient.delete('/api/auth/delete-account', {
-              headers: { Authorization: `Bearer ${token}` }
+              headers: { Authorization: `Bearer ${token}` },
             });
             Alert.alert('Done', 'Your account has been deleted.');
             await authContext?.logout();
+            
+            router.replace('/LoginScreen');
           } catch (e: any) {
-            const msg = e.response?.data || e.message || 'Failed to delete account.';
+            const msg = e?.response?.data || e?.message || 'Failed to delete account.';
             Alert.alert('Error', msg);
           }
-        }
-      }
+        },
+      },
     ]);
   };
 
@@ -237,7 +265,7 @@ const HomeScreen = () => {
         <Text style={styles.header}>EMOBUDGET</Text>
         <View className='flex flex-row mb-5'>
           <Ionicons name="cloud-outline" size={25} color="white" />
-          <Text className='font-lg font-flex tracking-wider' style={styles.email}>
+          <Text className='font-sm font-flex tracking-wider' style={styles.email}>
             Hi {authContext?.userEmail ?? "Unknown user"}
           </Text>
         </View>
@@ -342,8 +370,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     justifyContent: 'center', 
     alignItems: 'center', 
-    padding: 20 
-    
+    padding: 20
   },
 
   text: { fontSize: 20, color: '#333', marginBottom: 20 },
@@ -351,8 +378,11 @@ const styles = StyleSheet.create({
   highlightBox: { padding: 16, backgroundColor: '#fff3cd', borderRadius: 8, marginBottom: 20 },
   bigExpenseWarning: { marginTop: 8, color: 'red', fontWeight: 'bold' },
   email: {
-    textAlign: 'center', fontSize: 18, color: '#fff', marginLeft: 18,
-    display: 'flex', justifyContent: 'center', alignItems: 'center'
+    color: '#fff', 
+    marginLeft: 18,
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   header: {     
     fontSize: 25,          

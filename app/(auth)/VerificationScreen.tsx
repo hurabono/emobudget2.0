@@ -11,25 +11,29 @@ const VerificationScreen = () => {
   const [code, setCode] = useState('');
   const { email } = useLocalSearchParams<{ email: string }>();
   const router = useRouter();
+  const LOGIN_ROUTE = '/LoginScreen';
+
 
   const handleVerify = async () => {
     if (!code || code.length !== 6) {
-        Alert.alert("Invalid Code", "Please enter the 6-digit code.");
-        return;
+      Alert.alert("Invalid Code", "Please enter the 6-digit code.");
+      return;
     }
     try {
-      /* 09092025
-       * URL의 쿼리 파라미터 대신, 요청 본문(body)에 email과 code를 담아 보냅니다.
-       */
       await apiClient.post('/api/auth/verify-email', { email, code });
-      Alert.alert("Success", "Email verification successful. Please log in.", [
-          { text: 'OK', onPress: () => router.replace('/LoginScreen') }
-      ]);
+
+      // 알림만 띄우고, 곧바로 로그인 화면으로 교체 내비게이션
+      Alert.alert("Success", "Email verification successful. Please log in.");
+      setTimeout(() => {
+        router.replace(LOGIN_ROUTE);
+      }, 0); // 0~200ms 정도 권장
+
     } catch (error: any) {
       const errorMessage = error.response?.data || "An unexpected error occurred.";
       Alert.alert("Verification Failed", errorMessage);
     }
   };
+
 
   return (
     <GradientBackground>

@@ -50,6 +50,8 @@ const TransactionsScreen = () => {
 
   // 필요 시 true로 바꿔 테스트 고정 사용
   const IS_TEST_MODE = true;
+  const USE_TEST_DATA = IS_TEST_MODE && accounts.length > 0;
+
 
   // 실제 호출 시 인증 헤더가 필요할 수 있으므로 토큰 사용 (추가)
   const auth = useContext(AuthContext);
@@ -61,29 +63,32 @@ const TransactionsScreen = () => {
 
     const fetchData = async () => {
       try {
-        const endpoint = IS_TEST_MODE
+        const endpoint = USE_TEST_DATA
+
           ? '/api/analysis/spending-pattern?test=true'
           : '/api/analysis/spending-pattern';
 
         // 실제 모드면 Authorization 헤더와 타임아웃 추가
         const response = await apiClient.get<ApiResponse>(endpoint, {
-          headers: !IS_TEST_MODE && token ? { Authorization: `Bearer ${token}` } : undefined,
-          timeout: 20000, // 서버 웜업/지연 대비
+          headers: !USE_TEST_DATA && token ? { Authorization: `Bearer ${token}` } : undefined,
+          timeout: 20000,
         });
 
         if (!isActive) return;
         setData(response.data);
 
-        // 디버그 로그
-        console.log('[analysis] 응답 전체:', response.data);
-        console.log('[analysis] 첫 거래 샘플:', response.data.transactions?.[0]);
+        // Debug Log
+        console.log('[analysis] Entire Response:', response.data);
+        console.log('[analysis] Firtst Transaction sample:', response.data.transactions?.[0]);
         const nullIdCount = (response.data.transactions || []).filter((t) => !t.accountId).length;
-        console.log(`⚠️ [analysis] accountId가 비어있는 거래 수: ${nullIdCount} / ${response.data.transactions?.length || 0}`);
+        console.log(`⚠️ [analysis] Empty Transaction accountId: ${nullIdCount} / ${response.data.transactions?.length || 0}`);
+
       } catch (error: any) {
-        console.error('❌ 분석/거래 불러오기 실패(실모드 시도):', error?.code || error?.message || error);
+
+        console.error('❌ Failed to load transaction:', error?.code || error?.message || error);
 
         // 폴백: 실모드 실패/타임아웃이면 즉시 테스트 데이터로 재시도 (추가)
-        if (!IS_TEST_MODE) {
+        if (!USE_TEST_DATA) {
           try {
             const fallback = await apiClient.get<ApiResponse>(
               '/api/analysis/spending-pattern?test=true',
@@ -91,9 +96,9 @@ const TransactionsScreen = () => {
             );
             if (!isActive) return;
             setData(fallback.data);
-            console.log('🔁 테스트 데이터 폴백 성공');
+            console.log('🔁 Fallback successed testdata');
           } catch (fbErr) {
-            console.error('❌ 테스트 데이터 폴백도 실패:', fbErr);
+            console.error('❌ Failed test data load:', fbErr);
           }
         }
       } finally {
@@ -105,7 +110,10 @@ const TransactionsScreen = () => {
     return () => {
       isActive = false;
     };
-  }, [IS_TEST_MODE, token]);
+    }, [USE_TEST_DATA, token, accounts.length]);
+
+
+
 
   // 선택된 계좌 불러오기
   useEffect(() => {
@@ -114,16 +122,15 @@ const TransactionsScreen = () => {
     const fetchAccounts = async () => {
       try {
         const res = await apiClient.get<Account[]>('/accounts/selected', {
-          // 선택계좌도 인증 필요할 수 있으니 헤더 추가 무해
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
           timeout: 15000,
         });
         if (!isActive) return;
 
         setAccounts(res.data);
-        console.log('✅ [/accounts/selected] 응답:', res.data);
+        console.log('✅ [/accounts/selected] response:', res.data);
       } catch (e) {
-        console.error('❌ 계좌 불러오기 실패:', e);
+        console.error('❌ Failed load accounts:', e);
       }
     };
 
@@ -133,12 +140,15 @@ const TransactionsScreen = () => {
     };
   }, [token]);
 
+
+
+
   // accountId >>  nickname mapping
   const accountMap = useMemo(() => {
     const map: Record<string, string> = {};
     accounts.forEach((a) => {
       if (!a || !a.accountId) return;
-      map[a.accountId] = a.nickname || a.name || '(이름 없음)';
+      map[a.accountId] = a.nickname || a.name || '(no name)';
     });
     console.log('🗺️ accountMap keys:', Object.keys(map));
     return map;
