@@ -8,8 +8,8 @@ import ImportantExpenseSection from "../../components/ImportantExpenseSection";
 const AddImportantExpenseScreen = () => {
   return (
     <GradientBackground>
-      <Screen>
-        <SafeAreaView style={styles.container}>
+      <Screen center maxWidth={480}>
+        <SafeAreaView >
           <ImportantExpenseSection transactions={[]} />
         </SafeAreaView>
       </Screen>
@@ -18,7 +18,7 @@ const AddImportantExpenseScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "transparent" },
+
 });
 
 export default AddImportantExpenseScreen;

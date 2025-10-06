@@ -1,11 +1,15 @@
 // app/(app)/PlaidLinkScreen.web.tsx
+import Screen from '@/components/Screen';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { usePlaidLink } from 'react-plaid-link';
 import apiClient from '../../api';
+import GradientBackground from '../../components/GradientBackground';
 import { AuthContext } from '../../context/AuthContext';
+
+
 
 const webAlert = (title: string, message: string) => {
   alert(`${title}\n${message}`);
@@ -89,20 +93,10 @@ const PlaidLinkScreen = () => {
   const loading = !linkToken || !ready;
 
   return (
-    <View style={styles.root}>
-      {/* 배경 그라디언트 */}
-      <LinearGradient
-        colors={[
-          'rgba(251,203,201,0.25)',
-          'rgba(147,169,209,0.25)',
-          'rgba(14,15,18,0.5)',
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
-      />
 
-      <View style={styles.centerWrap}>
+    <GradientBackground>
+      <Screen>
+                <View style={styles.centerWrap}>
         <View style={styles.card}>
           {/* Header */}
           <View style={styles.cardHeader}>
@@ -153,23 +147,23 @@ const PlaidLinkScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
+
       </View>
-    </View>
+      </Screen>
+    </GradientBackground>
   );
 };
 
-// React Native 스타일 (HTML/CSS 없이 동일한 룩앤필)
 const styles = StyleSheet.create({
   root: {
     position: 'relative',
-    minHeight: '100vh' as unknown as number, // RN-web용 처리
+    minHeight: '100vh' as unknown as number,
     overflow: 'hidden',
     backgroundColor: '#0E0F12',
   },
   gradient: {
     position: 'absolute',
     left: 0, right: 0, top: 0, bottom: 0,
-    // 웹의 blur 대체는 어려워서 비슷한 투명/레이어로 처리
   },
   centerWrap: {
     position: 'relative',
@@ -182,7 +176,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 560,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(10, 9, 10, 0.21)',
     borderColor: 'rgba(255,255,255,0.14)',
     borderWidth: 1,
     borderRadius: 16,
@@ -201,10 +195,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
-    color: '#FBCBC9',
+    color: '#fafafa',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(251,203,201,0.15)',
-    borderColor: 'rgba(251,203,201,0.35)',
+    backgroundColor: 'rgba(143, 45, 42, 0.15)',
+    borderColor: 'rgba(124, 30, 27, 0.35)',
     borderWidth: 1,
     paddingHorizontal: 8,
     paddingVertical: 4,

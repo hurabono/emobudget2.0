@@ -203,7 +203,7 @@ const TransactionsScreen = () => {
 
   return (
     <GradientBackground>
-      <Screen>
+      <Screen center centerVertically maxWidth={480}>
       <SafeAreaView style={styles.container}>
         <FlatList
           data={data.transactions}

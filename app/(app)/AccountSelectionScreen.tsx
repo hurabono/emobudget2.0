@@ -78,7 +78,7 @@ const AccountSelectionScreen = () => {
 
   return (
     <GradientBackground>
-      <Screen>
+      <Screen center  maxWidth={480}>
         <View style={styles.container}>
           <Text className='font-flex tracking-widest' style={styles.title}>Select Account</Text>
 

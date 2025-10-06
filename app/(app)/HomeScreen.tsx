@@ -1,4 +1,3 @@
-// app/(app)/HomeScreen.tsx
 import Screen from '@/components/Screen';
 import Card from "@/components/ui/Card";
 import { Ionicons } from "@expo/vector-icons";
@@ -216,7 +215,7 @@ const HomeScreen = () => {
 
   const handleDelete = async () => {
     if (Platform.OS === 'web') {
-      // This is for Mobile platform
+      // this is for web
       const ok = window.confirm('Delete Account\nThis action is irreversible. Continue?');
       if (!ok) return;
 
@@ -235,7 +234,7 @@ const HomeScreen = () => {
       return;
     }
 
-   // this is web
+    // This is for Mobile platform 
     Alert.alert('Delete Account', 'This action is irreversible. Continue?', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -261,7 +260,7 @@ const HomeScreen = () => {
 
   return (
     <GradientBackground >
-      <Screen style={styles.container}>
+      <Screen center maxWidth={480}>
         <Text style={styles.header}>EMOBUDGET</Text>
         <View className='flex flex-row mb-5'>
           <Ionicons name="cloud-outline" size={25} color="white" />
@@ -304,7 +303,7 @@ const HomeScreen = () => {
         )}
 
 
-        {/* ✅ 최근 거래 Top 10 카드 */}
+        {/* Transaction Card */}
         {data?.transactions?.length ? (
           <Card>
             <Text className='font-flex text-2xl text-brand-blush font-bold tracking-wide mb-4'>
