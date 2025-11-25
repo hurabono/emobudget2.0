@@ -1,20 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as Notifications from "expo-notifications";
+// import * as Notifications from "expo-notifications";
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import apiClient from "../api";
 import Button from "../components/ui/Button";
 
+let Notifications: any = null;
+if (Platform.OS !== "web") {
+  Notifications = require("expo-notifications");
+}
 
 // Expo SDK 50+ notification handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+if (Platform.OS !== "web" && Notifications) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 interface ImportantExpenseBase {
   id?: number | string;

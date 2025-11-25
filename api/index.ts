@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://emobudgetserver.onrender.com',
+  baseURL: 'https://emobudget-gyf9fte8dqcsd6fy.canadacentral-01.azurewebsites.net',
   headers: {
     'Content-Type': 'application/json',
   },
