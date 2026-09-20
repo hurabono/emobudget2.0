@@ -1,11 +1,12 @@
 # Emobudget
-
+![Thumnail](https://ik.imagekit.io/stephanie/git-thum/emobudget.png?updatedAt=1786471498909)
 A mobile expense tracker that connects to real bank accounts and shows people where their money actually goes, including the spending they do because of how they feel.
 
 Most young adults asking "why am I always out of money?" cannot answer it from a banking app. Transactions arrive as a flat list with no shape, and the spending that hurts most, the impulse purchase after a bad day, looks identical to groceries. Emobudget connects the account, groups what comes back, and surfaces the pattern.
 
-## Click to watch the demo video
-[![Watch the demo](https://ik.imagekit.io/stephanie/git-thum/emobudget.png?updatedAt=1786471498909)](https://ik.imagekit.io/stephanie/git-thum/Emobudget.mp4)
+## Preview
+<img width="300" height="583" alt="emobudget-demo" src="https://github.com/user-attachments/assets/96fdf76b-5d68-4ce2-9831-51b165611f20" />
+
 
 ## What it does
 
