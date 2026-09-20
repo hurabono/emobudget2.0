@@ -1,50 +1,63 @@
-# Welcome to your Expo app 👋
+# Emobudget
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile expense tracker that connects to real bank accounts and shows people where their money actually goes, including the spending they do because of how they feel.
 
-## Get started
+Most young adults asking "why am I always out of money?" cannot answer it from a banking app. Transactions arrive as a flat list with no shape, and the spending that hurts most, the impulse purchase after a bad day, looks identical to groceries. Emobudget connects the account, groups what comes back, and surfaces the pattern.
 
-1. Install dependencies
+<!-- 데모 영상: ImageKit에 mp4 올린 뒤 아래 두 줄의 URL을 바꾸세요.
+     앞쪽 괄호 = 썸네일 이미지 경로, 뒤쪽 괄호 = mp4 주소 -->
+[![Watch the demo](https://ik.imagekit.io/stephanie/git-thum/emobudget.png?updatedAt=1786471498909)](https://ik.imagekit.io/stephanie/git-thum/Emobudget.mp4)
 
-   ```bash
-   npm install
-   ```
+## What it does
 
-2. Start the app
+- **Bank connection through Plaid.** Users link a real account through the Plaid Link SDK rather than typing transactions in by hand.
+- **Account selection.** Multiple linked accounts, the user chooses which ones the dashboard reads from.
+- **Transaction overview with emotional spending analysis.** Spending is grouped and charted so patterns are visible at a glance instead of buried in a list.
+- **Important expense alerts.** Users register upcoming transactions that must not be missed, and the app tracks them against the balance.
+- **Full authentication flow.** Sign up, email verification, login, forgot password, and reset password, all implemented rather than stubbed.
 
-   ```bash
-   npx expo start
-   ```
+## Architecture
 
-In the output, you'll find options to open the app in a
+This repository is the **mobile client**. It talks to a Spring Boot REST API deployed on **Azure App Service (Canada Central)**.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Expo / React Native client  ──►  Spring Boot REST API (Azure App Service)
+        │                                    │
+        │                                    ├── PostgreSQL
+   Plaid Link SDK                            ├── Spring Security (JWT)
+                                             └── Python service for spending analysis
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Authentication is JWT based. The token is held in `AsyncStorage` and attached by an Axios request interceptor in [`api/index.ts`](./api/index.ts), so every authenticated call carries it without the screens having to think about it.
 
-## Learn more
+Routing is file based through Expo Router, split into an `(auth)` group and an `(app)` group, so unauthenticated users cannot reach application screens by navigating.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Built with
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| | |
+|---|---|
+| Client | React Native, Expo, Expo Router, TypeScript |
+| Styling | NativeWind (Tailwind CSS for React Native) |
+| Banking | Plaid Link SDK (`react-native-plaid-link-sdk`) |
+| Charts | `react-native-chart-kit` |
+| HTTP | Axios with a JWT request interceptor |
+| Backend | Spring Boot, PostgreSQL, Spring Security, Docker, deployed to Azure App Service |
+| Analysis | Python, for spending pattern analysis |
+| API testing | Postman, every endpoint verified before it was wired to the client |
 
-## Join the community
+## Run it locally
 
-Join our community of developers creating universal apps.
+```bash
+npm install
+npx expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Then open it in Expo Go, an Android emulator, or an iOS simulator. The client points at the deployed Azure backend by default, so no local backend is required to try it.
+
+## What I took from it
+
+Connecting real financial accounts changes how you write everything else. Once actual bank data is moving through the app, every decision about where a token lives, which routes are protected, and what gets logged stops being theoretical. Wiring Plaid, then putting Spring Security in front of the paths that touch financial data, taught me more about handling sensitive data than any amount of reading would have.
+
+---
+
+Built by Stephanie (Heesu) Cho. September 2025.
