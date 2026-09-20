@@ -4,8 +4,7 @@ A mobile expense tracker that connects to real bank accounts and shows people wh
 
 Most young adults asking "why am I always out of money?" cannot answer it from a banking app. Transactions arrive as a flat list with no shape, and the spending that hurts most, the impulse purchase after a bad day, looks identical to groceries. Emobudget connects the account, groups what comes back, and surfaces the pattern.
 
-<!-- 데모 영상: ImageKit에 mp4 올린 뒤 아래 두 줄의 URL을 바꾸세요.
-     앞쪽 괄호 = 썸네일 이미지 경로, 뒤쪽 괄호 = mp4 주소 -->
+## Click to watch the demo video
 [![Watch the demo](https://ik.imagekit.io/stephanie/git-thum/emobudget.png?updatedAt=1786471498909)](https://ik.imagekit.io/stephanie/git-thum/Emobudget.mp4)
 
 ## What it does
